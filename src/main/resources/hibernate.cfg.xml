@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+    "-//Hibernate/Hibernate Configuration DTD//EN"
+    "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+  <session-factory>
+    <property name="connection.url">jdbc:mysql://localhost:3306/bus-data</property>
+    <property name="connection.driver_class">com.mysql.cj.jdbc.Driver</property>
+      <mapping class="com.cyssxt.common.entity.CarEntity"/>
+      <mapping class="com.cyssxt.common.entity.CarCharteredEntity"/>
+      <mapping class="com.cyssxt.common.entity.CarCheckHistoryEntity"/>
+      <mapping class="com.cyssxt.common.entity.CarCheckProjectEntity"/>
+      <mapping class="com.cyssxt.common.entity.CarCheckStatusEntity"/>
+      <mapping class="com.cyssxt.common.entity.CarSignUpEntity"/>
+      <mapping class="com.cyssxt.common.entity.CarStatusEntity"/>
+      <mapping class="com.cyssxt.common.entity.CarTypeEntity"/>
+      <mapping class="com.cyssxt.common.entity.CardEntity"/>
+      <mapping class="com.cyssxt.common.entity.ConfigEntity"/>
+      <mapping class="com.cyssxt.common.entity.GradeEntity"/>
+      <mapping class="com.cyssxt.common.entity.OrderInfoEntity"/>
+      <mapping class="com.cyssxt.common.entity.PackageInfoEntity"/>
+      <mapping class="com.cyssxt.common.entity.RefundOrderEntity"/>
+      <mapping class="com.cyssxt.common.entity.RouterEntity"/>
+      <mapping class="com.cyssxt.common.entity.SchoolEntity"/>
+      <mapping class="com.cyssxt.common.entity.StationEntity"/>
+      <mapping class="com.cyssxt.common.entity.StudentEntity"/>
+      <mapping class="com.cyssxt.common.entity.StudentOrderEntity"/>
+      <mapping class="com.cyssxt.common.entity.TravelEntity"/>
+      <mapping class="com.cyssxt.common.entity.UserEntity"/>
+      <mapping class="com.cyssxt.common.entity.UserStatusEntity"/>
+      <mapping class="com.cyssxt.common.entity.UserSessionEntity"/>
+      <!-- <property name="connection.username"/> -->
+    <!-- <property name="connection.password"/> -->
+
+    <!-- DB schema will be updated if needed -->
+    <!-- <property name="hibernate.hbm2ddl.auto">update</property> -->
+  </session-factory>
+</hibernate-configuration>
