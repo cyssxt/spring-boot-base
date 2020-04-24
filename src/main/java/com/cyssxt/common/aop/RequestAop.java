@@ -66,7 +66,7 @@ public class RequestAop {
 //            userId = request.getHeader(CustomHttpHeaders.U_USER_ID);
 //            signKey = request.getHeader(CustomHttpHeaders.U_SIGN_KEY);
         }
-        redisUtil.getStringValue();
+//        redisUtil.getStringValue();
         log.info("userType={},userId={}",userType,userId);
         Parameter[] parameters = method.getParameters();
         int length = parameters.length;
