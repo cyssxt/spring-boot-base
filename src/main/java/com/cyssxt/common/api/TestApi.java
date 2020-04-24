@@ -1,6 +1,7 @@
-package com.sean.datacenterapi;
+package com.cyssxt.common.api;
 
-import com.sean.datacenter.response.ResponseData;
+
+import com.cyssxt.common.response.ResponseData;
 
 public interface TestApi {
     ResponseData test();

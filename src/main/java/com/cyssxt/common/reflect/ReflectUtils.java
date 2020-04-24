@@ -1,10 +1,10 @@
 package com.cyssxt.common.reflect;
 
-import com.sean.datacenter.exception.ValidException;
-import com.sean.datacenter.response.CoreErrorMessage;
-import com.sean.datacentercommon.annotations.CopyFilter;
-import com.sean.datacentercommon.annotations.PrimaryKey;
-import com.sean.datacentercommon.util.CommonUtil;
+import com.cyssxt.common.annotations.CopyFilter;
+import com.cyssxt.common.annotations.PrimaryKey;
+import com.cyssxt.common.exception.ValidException;
+import com.cyssxt.common.response.CoreErrorMessage;
+import com.cyssxt.common.util.CommonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;

@@ -1,10 +1,10 @@
 package com.cyssxt.common.sign;
 
 import com.alibaba.fastjson.JSON;
-import com.sean.datacenter.exception.ValidException;
-import com.sean.datacenter.response.CoreErrorMessage;
+import com.cyssxt.common.exception.ValidException;
+import com.cyssxt.common.response.CoreErrorMessage;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.binary.Base64;
+import org.apache.tomcat.util.codec.binary.Base64;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -12,6 +12,7 @@ import java.security.MessageDigest;
 import java.text.CollationKey;
 import java.text.Collator;
 import java.util.*;
+
 @Slf4j
 public class SignUtil {
 

@@ -1,13 +1,13 @@
-package com.sean.datacenterapi.controller;
+package com.cyssxt.common.api.controller;
 
-import com.sean.datacenter.exception.ValidException;
-import com.sean.datacenter.response.ResponseData;
-import com.sean.datacenterapi.service.BaseService;
-import com.sean.datacenterentity.BaseEntity;
-import com.sean.datacentermodel.dto.BaseDto;
-import com.sean.datacentermodel.request.CreateReq;
-import com.sean.datacentermodel.request.DelReq;
-import com.sean.datacentermodel.request.PageReq;
+import com.cyssxt.common.api.service.BaseService;
+import com.cyssxt.common.dto.BaseDto;
+import com.cyssxt.common.entity.BaseEntity;
+import com.cyssxt.common.exception.ValidException;
+import com.cyssxt.common.request.CreateReq;
+import com.cyssxt.common.request.DelReq;
+import com.cyssxt.common.request.PageReq;
+import com.cyssxt.common.response.ResponseData;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;

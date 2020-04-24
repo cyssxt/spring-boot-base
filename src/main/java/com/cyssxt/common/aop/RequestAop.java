@@ -5,6 +5,7 @@ import com.cyssxt.common.annotation.Authorization;
 import com.cyssxt.common.config.SystemConfig;
 import com.cyssxt.common.exception.ValidException;
 import com.cyssxt.common.response.CoreErrorMessage;
+import com.cyssxt.common.util.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -16,7 +17,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 
@@ -30,12 +34,16 @@ public class RequestAop {
     private static final String USER_ID = "userId";
 //    private static final String SIGN_KEY = "signKey";
 
+
     @Pointcut("@annotation(org.springframework.web.bind.annotation.RequestMapping)||@annotation(org.springframework.web.bind.annotation.GetMapping)||@annotation(org.springframework.web.bind.annotation.PostMapping)")
     public void pointCut(){
     }
 
     @Resource
     SystemConfig systemConfig;
+
+    @Resource
+    RedisUtil redisUtil;
 
     /**
      * 接口拦截
@@ -52,7 +60,13 @@ public class RequestAop {
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         Byte userType = null;
         String userId = null;
-
+        if(requestAttributes!=null){
+            HttpServletRequest request = ((ServletRequestAttributes)requestAttributes).getRequest();
+//            clientId = request.getHeader(CustomHttpHeaders.U_CLIENT_ID);
+//            userId = request.getHeader(CustomHttpHeaders.U_USER_ID);
+//            signKey = request.getHeader(CustomHttpHeaders.U_SIGN_KEY);
+        }
+        redisUtil.getStringValue();
         log.info("userType={},userId={}",userType,userId);
         Parameter[] parameters = method.getParameters();
         int length = parameters.length;

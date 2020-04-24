@@ -1,7 +1,6 @@
 package com.cyssxt.common.util;
 
-import com.sean.datacenter.exception.ValidException;
-import com.sean.datacenter.response.CoreErrorMessage;
+import com.cyssxt.common.exception.ValidException;
 import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.pinyin4j.PinyinHelper;
 import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;

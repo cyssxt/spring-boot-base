@@ -1,15 +1,18 @@
 package com.cyssxt.common.util;
 
-import com.sean.datacenter.exception.ValidException;
-import com.sean.datacenter.response.CoreErrorMessage;
-import org.apache.commons.codec.binary.Base64;
+import com.cyssxt.common.exception.ValidException;
+import com.cyssxt.common.response.CoreErrorMessage;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.stereotype.Component;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.MessageDigest;
 import java.text.CollationKey;
 import java.text.Collator;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 @Component
 public class DataUtil {
@@ -93,7 +96,7 @@ public class DataUtil {
 //    public static String getSign(String signName,Map<String,Object> params) throws ValidException {
 //        return getSign(signKey,signName,params);
 //    }
-    public static String getSign(String secret,Map<String,Object> params) throws ValidException {
+    public static String getSign(String secret, Map<String,Object> params) throws ValidException {
         return getSign(secret,"sign",params);
     }
 
