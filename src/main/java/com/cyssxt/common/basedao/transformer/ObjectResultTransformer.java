@@ -4,7 +4,10 @@ import com.cyssxt.common.reflect.ReflectBean;
 import com.cyssxt.common.reflect.ReflectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,9 +20,19 @@ public class ObjectResultTransformer implements KeyTransformer {
     private List<String> keys = new ArrayList<>();
     private Filter filter;
     private String keyName;
+    private List<String> keyNames;
+    private Map<String,List<String>> keyMap = new HashMap<>();
     public ObjectResultTransformer(final Class<?> resultClass,String keyName) {
         this.resultClass = resultClass;
+        if(keyName==null ||keyName.equals("")){
+            keyName = "row_id";
+        }
         this.keyName = keyName;
+    }
+
+    public ObjectResultTransformer(final Class<?> resultClass,List<String> keyNames) {
+        this.resultClass = resultClass;
+        this.keyNames = keyNames;
     }
     public ObjectResultTransformer(final Class<?> resultClass, Filter filter) {
         this.resultClass = resultClass;
@@ -49,6 +62,14 @@ public class ObjectResultTransformer implements KeyTransformer {
                 }
                 if(alias.equals(this.keyName) || reflectBean.isKey()){
                     keys.add(object+"");//主键转为string
+                }
+                if(!CollectionUtils.isEmpty(keyNames) && keyNames.contains(alias)){
+                    List<String> items = keyMap.get(alias);
+                    if(items==null){
+                        items = new ArrayList<>();
+                        keyMap.put(alias,items);
+                    }
+                    items.add(object+"");
                 }
                 if(object!=null) {
                     ReflectUtils.copyValue(reflectBean, object, result);
@@ -100,5 +121,10 @@ public class ObjectResultTransformer implements KeyTransformer {
     @Override
     public List<String> getKeys() {
         return keys;
+    }
+
+    @Override
+    public Map<String, List<String>> getKeysMap() {
+        return keyMap;
     }
 }

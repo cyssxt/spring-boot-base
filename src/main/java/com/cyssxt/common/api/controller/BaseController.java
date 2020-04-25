@@ -2,6 +2,7 @@ package com.cyssxt.common.api.controller;
 
 import com.cyssxt.common.api.service.BaseService;
 import com.cyssxt.common.dto.BaseDto;
+import com.cyssxt.common.dto.CreateTimeDto;
 import com.cyssxt.common.entity.BaseEntity;
 import com.cyssxt.common.exception.ValidException;
 import com.cyssxt.common.request.CreateReq;
@@ -14,37 +15,34 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-public abstract class BaseController<T extends BaseEntity, V extends CreateReq, Q extends BaseDto, W extends PageReq> {
+import javax.validation.Valid;
+
+public abstract class BaseController<T extends BaseEntity, V extends CreateReq, Q extends CreateTimeDto, W extends PageReq> {
 
     public abstract BaseService getCommonService();
 
-    @RequestMapping(value="/",method = RequestMethod.POST)
-    public ResponseData create(@RequestBody V req, BindingResult result) throws ValidException {
-        return getCommonService().create(req);
-    }
-
     @RequestMapping(value="/list",method = RequestMethod.POST)
-    public ResponseData list(@RequestBody W req, BindingResult result) throws ValidException {
+    public ResponseData list(@Valid @RequestBody W req, BindingResult result) throws ValidException {
         return  getCommonService().list(req);
     }
 
-    @RequestMapping(value="/{contentId}",method = RequestMethod.GET)
-    public ResponseData list(@PathVariable("contentId")String contentId) throws ValidException {
-        return  getCommonService().infoResult(contentId);
-    }
+//    @RequestMapping(value="/{contentId}",method = RequestMethod.POST)
+//    public ResponseData list(@Valid @PathVariable("contentId")String contentId) throws ValidException {
+//        return  getCommonService().infoResult(contentId);
+//    }
 
     @RequestMapping(value="/page",method = RequestMethod.POST)
-    public ResponseData page(@RequestBody W req, BindingResult result) throws ValidException {
+    public ResponseData page(@Valid @RequestBody W req, BindingResult result) throws ValidException {
         return  getCommonService().page(req);
     }
 
-    @RequestMapping(value="/update",method = RequestMethod.PUT)
-    public ResponseData update(@RequestBody V req, BindingResult result) throws ValidException {
+    @RequestMapping(value="/update",method = RequestMethod.POST)
+    public ResponseData update(@Valid @RequestBody V req, BindingResult result) throws ValidException {
         return  getCommonService().update(req);
     }
 
-    @RequestMapping(value="/del",method = RequestMethod.DELETE)
-    public ResponseData del(@RequestBody DelReq req, BindingResult result) throws ValidException {
+    @RequestMapping(value="/del",method = RequestMethod.POST)
+    public ResponseData del(@Valid @RequestBody DelReq req, BindingResult result) throws ValidException {
         return  getCommonService().del(req);
     }
 }

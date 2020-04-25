@@ -3,10 +3,13 @@ package com.cyssxt.common.exception;
 import com.cyssxt.common.response.ErrorMessage;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class ValidException extends Throwable{
     ErrorMessage errorMessage;
     Object data;
+    List<String> errors;
 
     public ValidException(ErrorMessage errorMessage) {
         super(errorMessage.getMsg());
@@ -18,4 +21,11 @@ public class ValidException extends Throwable{
         this.errorMessage = errorMessage;
         this.data = t;
     }
+
+    public ValidException(ErrorMessage errorMessage,List<String> t) {
+        super(errorMessage.getMsg());
+        this.errorMessage = errorMessage;
+        this.errors = t;
+    }
+
 }

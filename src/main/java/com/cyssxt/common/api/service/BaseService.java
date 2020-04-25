@@ -80,18 +80,18 @@ public abstract class BaseService<T extends BaseEntity, V extends CreateReq, Q e
 
     public void afterCreate(T t, V v) {
     }
-    protected void beforeCreate(T t, V v){}
+    protected void beforeCreate(T t, V v) throws ValidException {}
     public void onDel(DelReq req) {
     }
 
-    public void beforeSave(T t, V v) {
+    public void beforeSave(T t, V v) throws ValidException {
         log.debug("beforeSave entity={},createReq={}",t,v);
     }
     public void afterSave(T t, V v) {
         log.debug("onSave entity={},createReq={}",t,v);
     }
 
-    public void beforeUpdate(T t, T old, V v){
+    public void beforeUpdate(T t, T old, V v) throws ValidException {
         log.debug("onUpdate entity={},old={},createReq={}",t,old,v);
     }
 
@@ -241,6 +241,7 @@ public abstract class BaseService<T extends BaseEntity, V extends CreateReq, Q e
      * @return
      */
     public String getSql(W w){return null;}
+    public List getKeys(){return null;}
 
     public PageResult<Q> pageItems(W w) throws ValidException {
         String sql = getPageSql(w);
@@ -327,7 +328,13 @@ public abstract class BaseService<T extends BaseEntity, V extends CreateReq, Q e
      * @throws ValidException
      */
     public <P> PageResult<P> pages(W w,Class dto,String sql) throws ValidException {
-        PageResult<P> page = queryFactory.selectPage(sql, getQueryParameter(w),w,dto);
+        List<String> keys = getKeys();
+        PageResult<P> page = null;
+        if(CollectionUtils.isEmpty(keys)) {
+            page = queryFactory.selectPage(sql, getQueryParameter(w), w, dto);
+        }else{
+            page = queryFactory.selectPageAndKeys(sql,getQueryParameter(w),w,dto,getKeys());
+        }
         return page;
     }
 
@@ -366,7 +373,7 @@ public abstract class BaseService<T extends BaseEntity, V extends CreateReq, Q e
         log.debug("onAfterQuery list={},w={},sql={}",list,w,sql);
     }
 
-    public void onAfterQuery(PageResult<Q> list, W w, String sql) {
+    public void onAfterQuery(PageResult<Q> list, W w, String sql) throws ValidException {
         log.debug("onAfterQuery list={},w={},sql={}",list,w,sql);
     }
 
@@ -376,10 +383,12 @@ public abstract class BaseService<T extends BaseEntity, V extends CreateReq, Q e
 
     public ResponseData update(V v) throws ValidException {
         String rowId = v.getRowId();
+        T t = null;
         if(StringUtils.isEmpty(rowId)){
-            throw new ValidException(CoreErrorMessage.ITEM_ID_NOT_NULL);
+            t = newEntity();
+        }else{
+            t = JpaUtil.get(rowId,getRepository(),true);
         }
-        T t = JpaUtil.get(rowId,getRepository(),true);
         T old = (T) t.clone();
         v.parse(t);
         beforeUpdate(t,old,v);

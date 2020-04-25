@@ -14,7 +14,14 @@ public enum CoreErrorMessage implements ErrorMessage{
     CANNOT_FIND_FIELD(10000010, "找不到字段"),
     CANNOT_FIND_FIELD_WITH_ANNOTATION(10000011, "找不到注解字段"),
     COPY_ERROR(10000012, "拷贝异常"),
-    CODE_NOT_EXIST(10000013,"验证码不存在" );
+    CODE_NOT_EXIST(10000013,"验证码不存在" ),
+    TOKEN_NOT_VALID(10000014, "token无效"),
+    USER_ID_NOT_NULL(10000015, "暂未登录"),
+    SHOULD_LOGIN(10000016, "请先登录"),
+    PARAM_ERROR(10000017, "参数错误"),
+    AUTHORIZATION_ERROR(10000018, "Authorization头错误"),
+    VALIDATOR_INIT_ERROR(10000019, "校验器处理失败"),
+    MD5_NOT_EXIST(10000020, "算法不存在");
     private Integer retCode;
     private String msg;
     private int status=200;

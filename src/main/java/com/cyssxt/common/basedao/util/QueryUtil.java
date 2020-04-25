@@ -63,7 +63,7 @@ public class QueryUtil {
         query.setFirstResult((pageNo-1)*pageSize);
         query.setMaxResults(pageSize);
         List<T> list = query.getResultList();
-        return new PageResult<T>(new PageResponse<T>(list,pageReq.getPageNo(),pageReq.getPageSize(),total),transformer.getKeys());
+        return new PageResult<T>(new PageResponse<T>(list,pageReq.getPageNo(),pageReq.getPageSize(),total),transformer.getKeys(),transformer.getKeysMap());
     }
 
     public static  <T> PageResponse<T> selectPage(EntityManager entityManager, String sql, Parameter parameter, PageReq pageReq, Class clazz) throws ValidException {

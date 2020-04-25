@@ -15,6 +15,6 @@ public class RestExceptionHandler {
     @ResponseBody
     public ResponseEntity valid(ValidException e){
         ErrorMessage errorMessage = e.getErrorMessage();
-        return ResponseEntity.status(errorMessage.getStatusCode()).body(ResponseData.fail(e.getErrorMessage()));
+        return ResponseEntity.status(errorMessage.getStatusCode()).body(ResponseData.fail(e));
     }
 }

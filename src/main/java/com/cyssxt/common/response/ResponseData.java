@@ -1,6 +1,9 @@
 package com.cyssxt.common.response;
 
+import com.cyssxt.common.exception.ValidException;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class ResponseData<T> {
@@ -9,6 +12,13 @@ public class ResponseData<T> {
     T data;
     String serviceType;
     String extra;
+    List<String> errors;
+
+    public static Object fail(ValidException e) {
+        ResponseData responseData = ResponseData.fail(e.getErrorMessage());
+        responseData.errors = e.getErrors();
+        return responseData;
+    }
 
     public Integer getRetCode() {
         return retCode;

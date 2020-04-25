@@ -1,5 +1,7 @@
 package com.cyssxt.common.annotation;
 
+import com.cyssxt.common.annotation.valid.impl.DefaultAuthorizationValidator;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -21,5 +23,6 @@ public @interface Authorization{
 
     String clientFieldName() default CustomHttpHeaders.U_CLIENT_ID;
 
+    Class validator() default DefaultAuthorizationValidator.class;
 
 }

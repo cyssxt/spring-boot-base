@@ -47,11 +47,23 @@ public class QueryFactory {
     public <T> ListResult<T> selectListAndKeys(String sql,QueryUtil.Parameter parameter,Class clazz) throws ValidException {
         return QueryUtil.selectList(entityManager,sql,parameter,new ObjectResultTransformer(clazz));
     }
+    public <T> PageResult<T> selectPage(Class<? extends BaseEntity> entityClass, QueryUtil.Parameter parameter, PageReq pageQuery, Class clazz) throws ValidException {
+        Table entity = entityClass.getAnnotation(Table.class);
+        if(entity==null){
+            throw new ValidException(CoreErrorMessage.QUERY_ENTITY_MAX_HAS_ENTITY_ANNOTATION);
+        }
+        String tableName = entity.name();
+        String sql = String.format("select * from %s ",tableName);
+        return selectPageAndKeys(sql,parameter,pageQuery,clazz,(String)null);
+    }
     public <T> PageResult<T> selectPage(String sql, QueryUtil.Parameter parameter, PageReq pageQuery, Class clazz) throws ValidException {
-        return selectPageAndKeys(sql,parameter,pageQuery,clazz,null);
+        return selectPageAndKeys(sql,parameter,pageQuery,clazz,(String)null);
     }
     public <T> PageResult<T> selectPageAndKeys(String sql, QueryUtil.Parameter parameter, PageReq pageQuery, Class clazz,String keyName) throws ValidException{
         return QueryUtil.selectPage(entityManager,sql,parameter,pageQuery,new ObjectResultTransformer(clazz,keyName));
+    }
+    public <T> PageResult<T> selectPageAndKeys(String sql, QueryUtil.Parameter parameter, PageReq pageQuery, Class clazz,List<String> keyNames) throws ValidException{
+        return QueryUtil.selectPage(entityManager,sql,parameter,pageQuery,new ObjectResultTransformer(clazz,keyNames));
     }
     public <T> ListResult<T> selectList(Class<? extends BaseEntity> entityClass, QueryParam[] queryParams, Class clazz) throws ValidException {
         return selectList(entityClass,queryParams,clazz,null);
@@ -62,6 +74,9 @@ public class QueryFactory {
     public <T> ListResult<T> selectListSort(Class<? extends BaseEntity> entityClass, QueryParam[] queryParams, Class clazz, QuerySort[] sorts) throws ValidException {
         return selectList(entityClass,queryParams,clazz,sorts,null);
     }
+//    public <T> ListResult<T> selectList(Class<? extends BaseEntity> entityClass, QueryParam[] queryParams, Class clazz, QuerySort[] sorts) throws ValidException {
+//        return selectList(entityClass,queryParams,clazz,sorts,null);
+//    }
     public <T> ListResult<T> selectList(Class<? extends BaseEntity> entityClass, QueryParam[] queryParams, Class clazz, QuerySort[] sorts, String keyName) throws ValidException {
         return selectList(entityClass,queryParams,clazz,sorts,null,keyName);
     }
