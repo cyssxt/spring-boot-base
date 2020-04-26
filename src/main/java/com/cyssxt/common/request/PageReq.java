@@ -1,8 +1,10 @@
 package com.cyssxt.common.request;
 
+import com.cyssxt.common.basedao.data.QueryFunction;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Map;
 
 @Data
 public class PageReq extends BaseReq {
@@ -14,6 +16,7 @@ public class PageReq extends BaseReq {
 
     public PageReq() {
     }
+
 
     public PageReq(Integer pageNo, Integer pageSize) {
         if(pageNo!=null) {

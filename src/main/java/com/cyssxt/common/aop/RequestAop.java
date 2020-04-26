@@ -95,7 +95,7 @@ public class RequestAop {
         List<String> errors = new ArrayList<>();
         for(int i=0;i<length;i++) {
             Object param = objects[i];
-            if(param instanceof BaseReq){
+            if(param instanceof BaseReq && !StringUtils.isEmpty(token)){
                ((BaseReq) param).setSessionId(token);
             }
             if (param instanceof BindingResult) {

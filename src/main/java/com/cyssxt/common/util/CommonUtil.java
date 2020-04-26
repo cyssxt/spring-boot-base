@@ -120,6 +120,9 @@ public class CommonUtil {
     public static String like(String value){
         return String.format("%%%s%%",value);
     }
+    public static String rightLike(String value){
+        return String.format("%s%%",value);
+    }
 
     public static boolean isTrue(Boolean obj){
         return obj!=null && obj;

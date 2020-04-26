@@ -7,4 +7,5 @@ public interface CommonUserService {
     UserInfo findById(String rowId) throws ValidException;
 
     String getUserId(String token);
+
 }

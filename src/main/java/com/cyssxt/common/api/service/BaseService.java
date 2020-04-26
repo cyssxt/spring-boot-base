@@ -18,6 +18,7 @@ import com.cyssxt.common.request.PageReq;
 import com.cyssxt.common.request.SortParam;
 import com.cyssxt.common.response.CoreErrorMessage;
 import com.cyssxt.common.response.ResponseData;
+import com.cyssxt.common.util.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -131,9 +132,20 @@ public abstract class BaseService<T extends BaseEntity, V extends CreateReq, Q e
             params.add(String.format(" %s=:%s ",key,key));
         }
     }
+    public void addNotEmptyParams(List<String> params,String value,Function function,QueryFunction.Param param,W w){
+        Object temp = function.apply(w);
+        if (temp!=null) {
+            params.add(String.format(" %s ",value));
+        }
+    }
     public void addNotEmptyParams(List<String> params, QueryFunction[] queryFunctions, W w){
         for (QueryFunction queryFunction:queryFunctions) {
-            addNotEmptyParams(params, queryFunction.getKey(), queryFunction.getFunction(),w);
+            Object value = queryFunction.getValue();
+            if(value instanceof String){
+                addNotEmptyParams(params, (String) value,queryFunction.getFunction(),queryFunction.getParam(), w);
+            }else {
+                addNotEmptyParams(params, queryFunction.getKey(), queryFunction.getFunction(), w);
+            }
         }
     }
 
@@ -201,12 +213,29 @@ public abstract class BaseService<T extends BaseEntity, V extends CreateReq, Q e
     protected void setNotEmptyValues(Query query,W w){
         QueryFunction[] queryFunctions = getQueryFunctions();
         for(QueryFunction function:queryFunctions) {
-            setNotEmptyValue(query, function.getKey(), function.getFunction(), w);
+//            Object value = function.getValue();
+//            if(value instanceof String){
+////                addNotEmptyParams(params, queryFunction.getKey(), (String) value,queryFunction.getExpression(),queryFunction.getParam(), w);
+//                setNotEmptyValue(query, function.getKey(),  (String) value);
+//            }else {
+//                addNotEmptyParams(params, queryFunction.getKey(), queryFunction.getFunction(), w);
+                setNotEmptyValue(query, function.getKey(), function.getFunction(), w,function.getParam());
+//            }
+//            setNotEmptyValue(query, function.getKey(), function.getFunction(), w);
         }
     }
 
-    protected void setNotEmptyValue(Query query,String key,Function function,W w) {
+    protected void setNotEmptyValue(Query query,String key,Function function,W w,QueryFunction.Param param) {
         Object value = function.apply(w);
+        if(value!=null){
+            if(param!=null && param== QueryFunction.Param.LIKE){
+                value = CommonUtil.rightLike(value+"");
+            }
+            query.setParameter(key,value);
+        }
+    }
+
+    protected void setNotEmptyValue(Query query,String key,String value) {
         if(value!=null){
             query.setParameter(key,value);
         }
