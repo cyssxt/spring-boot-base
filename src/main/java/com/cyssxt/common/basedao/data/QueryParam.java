@@ -18,4 +18,8 @@ public class QueryParam {
     public static QueryParam Builder(String key,String value){
         return new QueryParam(key,value);
     }
+
+    public static QueryParam notDel(){
+        return new QueryParam("del_flag",false);
+    }
 }

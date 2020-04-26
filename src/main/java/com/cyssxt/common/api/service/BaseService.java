@@ -57,6 +57,18 @@ public abstract class BaseService<T extends BaseEntity, V extends CreateReq, Q e
         }
     }
 
+    public <A extends Q> A info(String contentId,Class<A> commonDto) throws ValidException {
+        T t = JpaUtil.get(contentId,getRepository(),true);
+        try {
+            A a = commonDto.newInstance();
+            t.parse(a);
+            return a;
+        } catch (Exception e){
+            log.error("getDto error={}",e);
+            throw new ValidException(CoreErrorMessage.API_GET_DTO_ERROR);
+        }
+    }
+
     public ResponseData infoResult(String contentId) throws ValidException {
        return ResponseData.success(info(contentId));
     }
