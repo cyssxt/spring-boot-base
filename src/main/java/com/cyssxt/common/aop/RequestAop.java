@@ -218,7 +218,7 @@ public class RequestAop {
             if (throwable instanceof ValidException) {
                 throw (ValidException) throwable;
             }
-            throw new ValidException(CoreErrorMessage.SYSTEM_ERROR);
+            throw new ValidException(CoreErrorMessage.SYSTEM_ERROR,throwable.getMessage());
         }
     }
 
