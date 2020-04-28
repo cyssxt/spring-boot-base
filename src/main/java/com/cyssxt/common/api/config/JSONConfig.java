@@ -1,19 +1,20 @@
 package com.cyssxt.common.api.config;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.parser.ParserConfig;
 import com.alibaba.fastjson.serializer.*;
 import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
+import com.cyssxt.common.config.JSONEnum;
 import com.cyssxt.common.response.ResponseData;
-import com.fasterxml.jackson.databind.deser.std.DateDeserializers;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
-
 import javax.annotation.Resource;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Configuration
@@ -42,7 +43,23 @@ public class JSONConfig {
         if(configuration!=null && configuration.isValid() ) {
             fastJsonConfig.getSerializeConfig().put(ResponseData.class, new JavaBeanSerializer(ResponseData.class, configuration.toMap()));
         }
+//        fastJsonConfig.getSerializeFilters().
         fastJsonConfig.getSerializeConfig().put(Timestamp.class,new SimpleDateFormatSerializer("yyyy-MM-dd HH:mm:ss"));
+        fastJsonConfig.setSerializeFilters(new ValueFilter() {
+            @Override
+            public Object process(Object o, String s, Object o1) {
+                if(o1 instanceof JSONEnum){
+                    JSONEnum jsonEnum = (JSONEnum) o1;
+                    byte value = jsonEnum.getValue();
+                    String msg = jsonEnum.getMsg();
+                    HashMap result = new HashMap();
+                    result.put("name",msg);
+                    result.put("value",value);
+                    return  result;
+                }
+                return o1 ;
+            }
+        });
         // 3.在converter中添加配置信息
         fastConverter.setFastJsonConfig(fastJsonConfig);
         // 4.将converter赋值给HttpMessageConverter

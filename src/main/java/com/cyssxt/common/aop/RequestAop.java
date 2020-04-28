@@ -4,6 +4,7 @@ import com.cyssxt.common.annotation.Alias;
 import com.cyssxt.common.annotation.Authorization;
 import com.cyssxt.common.annotation.valid.AuthorizationValidator;
 import com.cyssxt.common.annotation.valid.impl.DefaultAuthorizationValidator;
+import com.cyssxt.common.api.controller.BaseController;
 import com.cyssxt.common.config.SystemConfig;
 import com.cyssxt.common.dto.UserInfo;
 import com.cyssxt.common.exception.ValidException;
@@ -31,6 +32,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Aspect
 @Component
@@ -45,13 +47,13 @@ public class RequestAop {
 
 
     @Pointcut("@annotation(org.springframework.web.bind.annotation.RequestMapping)||@annotation(org.springframework.web.bind.annotation.GetMapping)||@annotation(org.springframework.web.bind.annotation.PostMapping)")
-    public void pointCut(){
+    public void pointCut() {
     }
 
     @Resource
     SystemConfig systemConfig;
 
-    @Resource(name = "userService")
+    @Resource
     CommonUserService userService;
 
     /**
@@ -63,40 +65,51 @@ public class RequestAop {
         Object[] objects = pjp.getArgs();
         Method method = methodSignature.getMethod();
         Class parent = method.getDeclaringClass();
+        Object object = pjp.getTarget();
+        Authorization authorization = null;
+        Map<String, Class<? extends AuthorizationValidator>> authorizationConfig = null;
+        boolean flag = false;
+        if (object instanceof BaseController) {
+            authorization = object.getClass().getAnnotation(Authorization.class);
+            authorizationConfig = ((BaseController) object).getAuthorizationConfig();
+            flag = true;
+        } else {
+            authorization = (Authorization) parent.getAnnotation(Authorization.class);
+        }
         //使用类上加注解代表所有类需要授权
-        Authorization authorization= (Authorization) parent.getAnnotation(Authorization.class);
-        log.debug("params={},method={}",objects,method.getName());
+
+        log.debug("params={},method={}", objects, method.getName());
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         Byte userType = null;
         String userId;
         String token = null;
         UserInfo userInfo;
-        if(requestAttributes!=null){
-            HttpServletRequest request = ((ServletRequestAttributes)requestAttributes).getRequest();
+        if (requestAttributes != null) {
+            HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
             token = request.getHeader(HttpHeaders.AUTHORIZATION);
-            if(!StringUtils.isEmpty(token)) {
+            if (!StringUtils.isEmpty(token)) {
                 if (!token.startsWith("Bearer ")) {
                     throw new ValidException(CoreErrorMessage.AUTHORIZATION_ERROR);
                 } else {
                     token = token.replace("Bearer ", "").trim();
-                    if(StringUtils.isEmpty(token)){
+                    if (StringUtils.isEmpty(token)) {
                         throw new ValidException(CoreErrorMessage.AUTHORIZATION_ERROR);
                     }
                 }
             }
         }
-        log.debug("token={}",token);
-        if(authorization==null) {
-             authorization = method.getDeclaredAnnotation(Authorization.class);
+        log.debug("token={}", token);
+        if (authorization == null) {
+            authorization = method.getDeclaredAnnotation(Authorization.class);
         }
 
         Parameter[] parameters = method.getParameters();
         int length = parameters.length;
         List<String> errors = new ArrayList<>();
-        for(int i=0;i<length;i++) {
+        for (int i = 0; i < length; i++) {
             Object param = objects[i];
-            if(param instanceof BaseReq && !StringUtils.isEmpty(token)){
-               ((BaseReq) param).setSessionId(token);
+            if (param instanceof BaseReq && !StringUtils.isEmpty(token)) {
+                ((BaseReq) param).setSessionId(token);
             }
             if (param instanceof BindingResult) {
                 BindingResult bindingResult = (BindingResult) objects[i];
@@ -117,50 +130,93 @@ public class RequestAop {
                 break;
             }
         }
-        if(authorization!=null){
-            if(StringUtils.isEmpty(token)){
-               throw new ValidException(CoreErrorMessage.SHOULD_LOGIN);
+        Class<? extends AuthorizationValidator> validatorClass = null;
+        if(flag){
+            String methodName = method.getName();
+            validatorClass = authorizationConfig.get(methodName);
+        }
+        if (authorization != null || validatorClass!=null) {
+            if (authorization!=null) {//如果是基础类，则调用AuthorizationConfig
+                Class validator = authorization.validator();
+                if (validator == DefaultAuthorizationValidator.class) {
+                    validatorClass = null;
+                }
+            }
+            if (StringUtils.isEmpty(token) && validatorClass!=null) {
+                throw new ValidException(CoreErrorMessage.SHOULD_LOGIN);
             }
             userId = userService.getUserId(token);
-            if(StringUtils.isEmpty(userId)) {
-               throw new ValidException(CoreErrorMessage.USER_ID_NOT_NULL);
+            if (StringUtils.isEmpty(userId) && validatorClass!=null) {
+                throw new ValidException(CoreErrorMessage.USER_ID_NOT_NULL);
+            }
+            if(userId==null){
+                throw new ValidException(CoreErrorMessage.USER_ID_NOT_NULL);
             }
             userId = userId.split("_")[0];
             userInfo = userService.findById(userId);
-            Class validator = authorization.validator();
-            if(validator != DefaultAuthorizationValidator.class){
+            userType = userInfo.getType();
+            if (validatorClass != null) {
                 try {
-                    AuthorizationValidator authorizationValidator = (AuthorizationValidator) validator.newInstance();
+                    AuthorizationValidator authorizationValidator = validatorClass.newInstance();
                     authorizationValidator.check(userInfo);
                 } catch (Exception e) {
                     throw new ValidException(CoreErrorMessage.VALIDATOR_INIT_ERROR);
                 }
             }
-            for(int j=0;j<length;j++){
+//            if (validatorClass != DefaultAuthorizationValidator.class) {
+//                try {
+//                    AuthorizationValidator authorizationValidator =  validatorClass.newInstance();
+//                    authorizationValidator.check(userInfo);
+//                } catch (Exception e) {
+//                    throw new ValidException(CoreErrorMessage.VALIDATOR_INIT_ERROR);
+//                }
+//            }
+//            if (flag && authorizationConfig != null) {//如果是基础类，则调用AuthorizationConfig
+//                String methodName = method.getName();
+//                Class<? extends AuthorizationValidator> validatorClass = authorizationConfig.get(methodName);
+//                if (validatorClass != null)
+//                    try {
+//                        AuthorizationValidator authorizationValidator = validatorClass.newInstance();
+//                        authorizationValidator.check(userInfo);
+//                    } catch (Exception e) {
+//                        throw new ValidException(CoreErrorMessage.VALIDATOR_INIT_ERROR);
+//                    }
+//            } else {
+//                Class validator = authorization.validator();
+//                if (validator != DefaultAuthorizationValidator.class) {
+//                    try {
+//                        AuthorizationValidator authorizationValidator = (AuthorizationValidator) validator.newInstance();
+//                        authorizationValidator.check(userInfo);
+//                    } catch (Exception e) {
+//                        throw new ValidException(CoreErrorMessage.VALIDATOR_INIT_ERROR);
+//                    }
+//                }
+//            }
+            for (int j = 0; j < length; j++) {
                 Parameter parameter = parameters[j];
                 String name = parameter.getName();
-                Alias alias =  parameter.getAnnotation(Alias.class);
-                if(alias!=null) {
+                Alias alias = parameter.getAnnotation(Alias.class);
+                if (alias != null) {
                     name = alias.value();
                 }
-                if(USER_TYPE.equals(name)){
+                if (USER_TYPE.equals(name)) {
                     objects[j] = userType;
-                }else if(USER_ID.equals(name)){
+                } else if (USER_ID.equals(name)) {
                     objects[j] = userId;
-                }else if(USER.equals(name)){
+                } else if (USER.equals(name)) {
                     objects[j] = userInfo;
                 }
             }
-            if(userInfo==null){
+            if (userInfo == null) {
                 throw new ValidException(CoreErrorMessage.TOKEN_NOT_VALID);
             }
         }
         try {
             return pjp.proceed(objects);
         } catch (Throwable throwable) {
-            log.error("proceed={}",throwable);
-            if(throwable instanceof ValidException){
-                throw  (ValidException)throwable;
+            log.error("proceed={}", throwable);
+            if (throwable instanceof ValidException) {
+                throw (ValidException) throwable;
             }
             throw new ValidException(CoreErrorMessage.SYSTEM_ERROR);
         }

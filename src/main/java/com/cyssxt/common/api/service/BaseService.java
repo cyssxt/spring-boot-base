@@ -1,5 +1,6 @@
 package com.cyssxt.common.api.service;
 
+import com.cyssxt.common.basedao.Callback;
 import com.cyssxt.common.basedao.dao.BaseRepository;
 import com.cyssxt.common.basedao.data.QueryFunction;
 import com.cyssxt.common.basedao.data.QuerySort;
@@ -26,9 +27,7 @@ import javax.annotation.Resource;
 import javax.persistence.Column;
 import javax.persistence.Query;
 import javax.persistence.Table;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -133,6 +132,10 @@ public abstract class BaseService<T extends BaseEntity, V extends CreateReq, Q e
         }
     }
     public void addNotEmptyParams(List<String> params,String value,Function function,QueryFunction.Param param,W w){
+        if(function==null){
+            params.add(value);
+            return;
+        }
         Object temp = function.apply(w);
         if (temp!=null) {
             params.add(String.format(" %s ",value));
@@ -226,6 +229,9 @@ public abstract class BaseService<T extends BaseEntity, V extends CreateReq, Q e
     }
 
     protected void setNotEmptyValue(Query query,String key,Function function,W w,QueryFunction.Param param) {
+        if (function == null) {
+            return;
+        }
         Object value = function.apply(w);
         if(value!=null){
             if(param!=null && param== QueryFunction.Param.LIKE){
@@ -259,6 +265,7 @@ public abstract class BaseService<T extends BaseEntity, V extends CreateReq, Q e
 
     public ResponseData create(V req) throws ValidException {
         T t = newEntity();
+        checkParam(req);
         req.parse(t);
         beforeCreate(t,req);
         getRepository().save(t);
@@ -269,6 +276,7 @@ public abstract class BaseService<T extends BaseEntity, V extends CreateReq, Q e
     public ResponseData page(W w) throws ValidException {
         return ResponseData.success(pageItems(w).getData());
     }
+
 
     //分页自定sql
     public String getPageSql(W w){
@@ -282,7 +290,7 @@ public abstract class BaseService<T extends BaseEntity, V extends CreateReq, Q e
      * @return
      */
     public String getSql(W w){return null;}
-    public List getKeys(){return null;}
+    public List getKeys(){return new ArrayList();}
 
     public PageResult<Q> pageItems(W w) throws ValidException {
         String sql = getPageSql(w);
@@ -370,14 +378,19 @@ public abstract class BaseService<T extends BaseEntity, V extends CreateReq, Q e
      */
     public <P> PageResult<P> pages(W w,Class dto,String sql) throws ValidException {
         List<String> keys = getKeys();
+        addKeys(keys);
         PageResult<P> page = null;
         if(CollectionUtils.isEmpty(keys)) {
             page = queryFactory.selectPage(sql, getQueryParameter(w), w, dto);
         }else{
-            page = queryFactory.selectPageAndKeys(sql,getQueryParameter(w),w,dto,getKeys());
+            page = queryFactory.selectPageAndKeys(sql,getQueryParameter(w),w,dto,keys);
         }
         return page;
     }
+
+    public void addKeys(List<String> keys){
+    }
+
 
     /**
      *
@@ -414,19 +427,25 @@ public abstract class BaseService<T extends BaseEntity, V extends CreateReq, Q e
         log.debug("onAfterQuery list={},w={},sql={}",list,w,sql);
     }
 
-    public void onAfterQuery(PageResult<Q> list, W w, String sql) throws ValidException {
-        log.debug("onAfterQuery list={},w={},sql={}",list,w,sql);
+    public void onAfterQuery(PageResult<Q> pageResult, W w, String sql) throws ValidException {
+        log.debug("onAfterQuery pageResult={},w={},sql={}",pageResult,w,sql);
     }
 
     public T get(String rowId) throws ValidException {
         return JpaUtil.get(rowId,getRepository(),true);
     }
 
+    public void checkParam(V v) throws ValidException {
+        log.debug("v={}",v);
+    }
+
     public ResponseData update(V v) throws ValidException {
         String rowId = v.getRowId();
         T t = null;
+        checkParam(v);
         if(StringUtils.isEmpty(rowId)){
             t = newEntity();
+            beforeCreate(t,v);
         }else{
             t = JpaUtil.get(rowId,getRepository(),true);
         }
@@ -468,5 +487,13 @@ public abstract class BaseService<T extends BaseEntity, V extends CreateReq, Q e
             querySorts[i] = querySort;
         }
         return querySorts;
+    }
+
+    public Map<String, Q> queryInRowIds(Set<String> ids) throws ValidException {
+        return queryFactory.selectByInRowIds(getEntityClass(), getDto(),ids);
+    }
+
+    public Map<String, Q> queryInRowIds(Set<String> ids, Callback<Q> callback) throws ValidException {
+        return queryFactory.selectByInRowIds(getEntityClass(),getDto(),ids,callback);
     }
 }

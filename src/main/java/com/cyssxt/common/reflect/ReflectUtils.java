@@ -294,7 +294,7 @@ public class ReflectUtils {
 //            logger.info("param={},{}", param, type);
             Method method = reflectBean.getMethod();
             try {
-                System.out.println(method.getName());
+//                System.out.println(method.getName());
                 method.invoke(result, param);
             }catch (Exception e){
                 logger.error("{} parse error",method);

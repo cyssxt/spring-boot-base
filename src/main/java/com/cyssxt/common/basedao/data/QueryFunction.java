@@ -7,7 +7,7 @@ import java.util.function.Function;
 
 @Data
 public class QueryFunction<T,V>{
-    String key;
+    String key = null;
     Function<T,V> function;
     String value;
     Expression expression = Expression.EQUAL;
@@ -16,6 +16,9 @@ public class QueryFunction<T,V>{
     public QueryFunction(String key, Function function) {
         this.key = key;
         this.function = function;
+    }
+    public QueryFunction(String value) {
+        this.value = value;
     }
 
     public QueryFunction(String key, Function function, String value,Param param) {

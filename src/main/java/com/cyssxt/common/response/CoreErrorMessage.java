@@ -21,7 +21,8 @@ public enum CoreErrorMessage implements ErrorMessage{
     PARAM_ERROR(10000017, "参数错误"),
     AUTHORIZATION_ERROR(10000018, "Authorization头错误"),
     VALIDATOR_INIT_ERROR(10000019, "校验器处理失败"),
-    MD5_NOT_EXIST(10000020, "算法不存在");
+    MD5_NOT_EXIST(10000020, "算法不存在"),
+    DTO_CLASS_NOT_EXIST(10000021, "视图类不存在");
     private Integer retCode;
     private String msg;
     private int status=200;

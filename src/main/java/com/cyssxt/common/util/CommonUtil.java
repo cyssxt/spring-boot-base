@@ -7,6 +7,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -132,4 +133,10 @@ public class CommonUtil {
         System.out.println(CommonUtil.random(32));
     }
 
+    public static<T> T get(Map<String,T> carDtoMap, String carId) {
+        if(carDtoMap==null){
+            return null;
+        }
+        return carDtoMap.get(carId);
+    }
 }

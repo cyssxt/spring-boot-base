@@ -1,5 +1,6 @@
 package com.cyssxt.common.basedao.util;
 
+import com.cyssxt.common.basedao.Callback;
 import com.cyssxt.common.basedao.data.QueryExpression;
 import com.cyssxt.common.basedao.data.QueryParam;
 import com.cyssxt.common.basedao.data.QuerySort;
@@ -15,11 +16,18 @@ import com.cyssxt.common.response.CoreErrorMessage;
 import com.cyssxt.common.response.PageResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 public class QueryFactory {
@@ -131,6 +139,9 @@ public class QueryFactory {
         return (List<T>) selectList(entityClass,queryParams,clazz).getData();
     }
     public <T> T selectOneById(Class<? extends BaseEntity> entityClass, String rowId,Class clazz) throws ValidException {
+        if(!StringUtils.isEmpty(rowId)){
+            return null;
+        }
         return selectOne(entityClass,new QueryParam[]{
                 new QueryParam(ROW_ID,rowId),
                 new QueryParam(DEL_FLAG,false)
@@ -150,6 +161,41 @@ public class QueryFactory {
             return null;
         }
         return data.get(0);
+    }
+    public <T  extends BaseDto> Map<String,T> selectByInRowIds(Class<? extends BaseEntity> clazz, Class<T> dtoClass, Set<String> ids) throws ValidException {
+        return selectByInRowIds(clazz,dtoClass,ids,null);
+    }
+    public <T  extends BaseDto> Map<String,T> selectByInRowIds(Class<? extends BaseEntity> clazz, Class<T> dtoClass, Set<String> ids, Callback<T> call) throws ValidException {
+        if(dtoClass==null){
+            throw new ValidException(CoreErrorMessage.DTO_CLASS_NOT_EXIST);
+        }
+        if(CollectionUtils.isEmpty(ids)){
+            return null;
+        }
+        ListResult<T> studentDtoListResult = selectList(clazz,
+                new QueryParam[]{
+                        QueryParam.notDel(),
+                        QueryParam.in(ids)
+                },dtoClass);
+        List<T> data = studentDtoListResult.getData();
+        return data.stream().collect(Collectors.toMap(BaseDto::getRowId, t -> {
+            if(call!=null) {
+                call.each(t);
+            }
+            return t;
+        }));
+    }
+    public  <T  extends BaseDto> Map<String,T> selectByInRowIds(String sql, Class<T> dtoClass,QueryParam[] queryParams) throws ValidException {
+        return selectByInRowIds(sql,dtoClass,queryParams,null);
+    }
+    public  <T  extends BaseDto> Map<String,T> selectByInRowIds(String sql, Class<T> dtoClass,QueryParam[] queryParams,Callback<T> call) throws ValidException {
+        ListResult<T> listResult =  selectList(sql,queryParams,dtoClass);
+        return listResult.getData().stream().collect(Collectors.toMap(BaseDto::getRowId, t -> {
+            if(call!=null) {
+                call.each(t);
+            }
+            return t;
+        }));
     }
 
     public static void main(String[] args) throws ValidException {

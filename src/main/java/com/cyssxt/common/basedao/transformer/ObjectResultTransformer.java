@@ -6,10 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ObjectResultTransformer implements KeyTransformer {
 
@@ -17,11 +14,11 @@ public class ObjectResultTransformer implements KeyTransformer {
     private final static Logger logger = LoggerFactory.getLogger(ObjectResultTransformer.class);
 
     private final Class<?> resultClass;
-    private List<String> keys = new ArrayList<>();
+    private Set<String> keys = new HashSet<>();
     private Filter filter;
     private String keyName;
     private List<String> keyNames;
-    private Map<String,List<String>> keyMap = new HashMap<>();
+    private Map<String, Set<String>> keyMap = new HashMap<>();
     public ObjectResultTransformer(final Class<?> resultClass,String keyName) {
         this.resultClass = resultClass;
         if(keyName==null ||keyName.equals("")){
@@ -64,9 +61,9 @@ public class ObjectResultTransformer implements KeyTransformer {
                     keys.add(object+"");//主键转为string
                 }
                 if(!CollectionUtils.isEmpty(keyNames) && keyNames.contains(alias)){
-                    List<String> items = keyMap.get(alias);
+                    Set<String> items = keyMap.get(alias);
                     if(items==null){
-                        items = new ArrayList<>();
+                        items = new HashSet<>();
                         keyMap.put(alias,items);
                     }
                     items.add(object+"");
@@ -119,12 +116,12 @@ public class ObjectResultTransformer implements KeyTransformer {
     }
 
     @Override
-    public List<String> getKeys() {
+    public Set<String> getKeys() {
         return keys;
     }
 
     @Override
-    public Map<String, List<String>> getKeysMap() {
+    public Map<String, Set<String>> getKeysMap() {
         return keyMap;
     }
 }
