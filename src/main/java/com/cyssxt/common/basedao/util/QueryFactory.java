@@ -182,7 +182,6 @@ public class QueryFactory {
         }
         ListResult<T> studentDtoListResult = selectListByKeys(clazz,
                 new QueryParam[]{
-                        QueryParam.notDel(),
                         QueryParam.in(ids)
                 },dtoClass);
         List<T> data = studentDtoListResult.getData();

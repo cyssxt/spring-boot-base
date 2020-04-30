@@ -118,7 +118,7 @@ public abstract class BaseService<T extends BaseEntity, V extends CreateReq, Q e
     public void beforeSave(T t, V v) throws ValidException {
         log.debug("beforeSave entity={},createReq={}",t,v);
     }
-    public void afterSave(T t, V v) {
+    public void afterSave(T t, V v) throws ValidException {
         log.debug("onSave entity={},createReq={}",t,v);
     }
 

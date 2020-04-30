@@ -8,6 +8,7 @@ import java.util.Date;
 public class DateUtil {
     private final static String yyyyMMDDHHMMSSSSS ="yyyyMMddHHmmssSSS";
     private final static String yyyyMMdd="yyyyMMdd";
+    private final static String HHmm="HH:mm";
     public static Timestamp getCurrentTimestamp(){
         return new Timestamp(new Date().getTime());
     }
@@ -16,6 +17,10 @@ public class DateUtil {
         Date date = new Date();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(yyyyMMDDHHMMSSSSS);
         return simpleDateFormat.format(date);
+    }
+    public static String getTimeStr(Calendar calendar) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(HHmm);
+        return simpleDateFormat.format(calendar.getTime());
     }
 
     public static Timestamp getDateTimeWithOutTime(Timestamp time) {
