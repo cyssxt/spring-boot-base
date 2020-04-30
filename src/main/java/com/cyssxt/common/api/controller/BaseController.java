@@ -4,6 +4,7 @@ import com.cyssxt.common.annotation.Authorization;
 import com.cyssxt.common.annotation.valid.AuthorizationValidator;
 import com.cyssxt.common.annotation.valid.impl.BaseApiValidator;
 import com.cyssxt.common.annotation.valid.impl.DefaultAuthorizationValidator;
+import com.cyssxt.common.api.controller.req.InfoReq;
 import com.cyssxt.common.api.service.BaseService;
 import com.cyssxt.common.dto.CreateTimeDto;
 import com.cyssxt.common.entity.BaseEntity;
@@ -38,10 +39,10 @@ public abstract class BaseController<T extends BaseEntity, V extends CreateReq, 
         return  getCommonService().list(req);
     }
 
-//    @RequestMapping(value="/{contentId}",method = RequestMethod.POST)
-//    public ResponseData list(@Valid @PathVariable("contentId")String contentId) throws ValidException {
-//        return  getCommonService().infoResult(contentId);
-//    }
+    @RequestMapping(value="/info",method = RequestMethod.POST)
+    public ResponseData list(@Valid @RequestBody InfoReq req) throws ValidException {
+        return  getCommonService().infoResult(req.getRowId());
+    }
     @RequestMapping(value="/page",method = RequestMethod.POST)
     public ResponseData page(@Valid @RequestBody W req, BindingResult result) throws ValidException {
         return  getCommonService().page(req);

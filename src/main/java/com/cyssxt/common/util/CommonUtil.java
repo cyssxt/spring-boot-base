@@ -2,7 +2,9 @@ package com.cyssxt.common.util;
 
 import com.cyssxt.common.exception.ValidException;
 import com.cyssxt.common.response.CoreErrorMessage;
+import org.springframework.util.StringUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -14,13 +16,13 @@ import java.util.regex.Pattern;
 
 public class CommonUtil {
 
-    public static String uuid(){
+    public static String uuid() {
         return UUID.randomUUID().toString();
     }
 
     private final static char[] RANDOM_CODES = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
             'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
-            'j', 'k','l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
+            'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
 
     private final static char[] INT_CODES = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
@@ -42,24 +44,25 @@ public class CommonUtil {
         }
         return md5code;
     }
+
     public static boolean isInteger(String str) {
         Pattern pattern = Pattern.compile("^[-\\+]?[\\d]*$");
         return pattern.matcher(str).matches();
     }
 
-    public static String random(int length){
-        return random(length,true);
+    public static String random(int length) {
+        return random(length, true);
     }
 
-    public static Integer randomInt(){
+    public static Integer randomInt() {
         Random random = new Random();
         return random.nextInt(999);
     }
 
-    public static String random(int length,boolean upper){
+    public static String random(int length, boolean upper) {
         StringBuffer buffer = new StringBuffer();
-        int total = upper?RANDOM_CODES_LENGTH:RANDOM_CODES_UPPER_LENGTH;
-        for(int i=0;i<length;i++){
+        int total = upper ? RANDOM_CODES_LENGTH : RANDOM_CODES_UPPER_LENGTH;
+        for (int i = 0; i < length; i++) {
             Random random = new Random();
             int index = random.nextInt(total);
             buffer.append(RANDOM_CODES[index]);
@@ -67,36 +70,32 @@ public class CommonUtil {
         return buffer.toString();
     }
 
-    public static String randomInt(int length){
+    public static String randomInt(int length) {
         StringBuffer buffer = new StringBuffer();
         int total = INT_CODES_LENGTH;
-        for(int i=0;i<length;i++){
+        for (int i = 0; i < length; i++) {
             Random random = new Random();
             int index = random.nextInt(total);
             buffer.append(INT_CODES[index]);
         }
         return buffer.toString();
     }
+
     /**
      * 判断对象为空
      *
-     * @param obj
-     *            对象名
+     * @param obj 对象名
      * @return 是否为空
      */
     @SuppressWarnings("rawtypes")
-    public static boolean isEmpty(Object obj)
-    {
-        if (obj == null)
-        {
+    public static boolean isEmpty(Object obj) {
+        if (obj == null) {
             return true;
         }
-        if ((obj instanceof List))
-        {
+        if ((obj instanceof List)) {
             return ((List) obj).size() == 0;
         }
-        if ((obj instanceof String))
-        {
+        if ((obj instanceof String)) {
             return ((String) obj).trim().equals("");
         }
         return false;
@@ -105,38 +104,57 @@ public class CommonUtil {
     /**
      * 判断对象不为空
      *
-     * @param obj
-     *            对象名
+     * @param obj 对象名
      * @return 是否不为空
      */
-    public static boolean isNotEmpty(Object obj)
-    {
+    public static boolean isNotEmpty(Object obj) {
         return !isEmpty(obj);
     }
 
-    public static String generatorKey(){
-        return UUID.randomUUID().toString().replace("-","");
+    public static String generatorKey() {
+        return UUID.randomUUID().toString().replace("-", "");
     }
 
-    public static String like(String value){
-        return String.format("%%%s%%",value);
-    }
-    public static String rightLike(String value){
-        return String.format("%s%%",value);
+    public static String like(String value) {
+        return String.format("%%%s%%", value);
     }
 
-    public static boolean isTrue(Boolean obj){
-        return obj!=null && obj;
+    public static String rightLike(String value) {
+        return String.format("%s%%", value);
+    }
+
+    public static boolean isTrue(Boolean obj) {
+        return obj != null && obj;
     }
 
     public static void main(String[] args) {
         System.out.println(CommonUtil.random(32));
     }
 
-    public static<T> T get(Map<String,T> carDtoMap, String carId) {
-        if(carDtoMap==null){
+    public static <T> T get(Map<String, T> carDtoMap, String carId) {
+        if (carDtoMap == null) {
             return null;
         }
         return carDtoMap.get(carId);
+    }
+
+
+    public static String getIp(HttpServletRequest request) {
+        String ip = request.getHeader("X-Real-IP");
+        if (!StringUtils.isEmpty(ip) && !"unknown".equalsIgnoreCase(ip)) {
+            return ip;
+        }
+        ip = request.getHeader("X-Forwarded-For");
+        if (!StringUtils.isEmpty(ip) && !"unknown".equalsIgnoreCase(ip)) {
+            // 多次反向代理后会有多个IP值，第一个为真实IP。
+            int index = ip.indexOf(',');
+            if (index != -1) {
+                return ip.substring(0, index);
+            } else {
+                return ip;
+            }
+        } else {
+            return request.getRemoteAddr();
+        }
     }
 }

@@ -17,6 +17,10 @@ public class QueryFunction<T,V>{
         this.key = key;
         this.function = function;
     }
+
+    public static QueryFunction equal(String key, Function function) {
+        return new QueryFunction(key,function);
+    }
     public QueryFunction(String value) {
         this.value = value;
     }
@@ -26,6 +30,12 @@ public class QueryFunction<T,V>{
         this.function = function;
         this.value = value;
         this.param = param;
+    }
+
+    public QueryFunction(String key, Function function, String value) {
+        this.key = key;
+        this.function = function;
+        this.value = value;
     }
 
     public enum  Expression {

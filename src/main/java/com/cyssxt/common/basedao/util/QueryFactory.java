@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component
 public class QueryFactory {
@@ -37,15 +36,15 @@ public class QueryFactory {
     @PersistenceContext
     EntityManager entityManager;
 
-    public <T> ListResult<T> selectList(String sql, QueryUtil.Parameter parameter, Class clazz, String keyName) throws ValidException {
+    public <T> ListResult<T> selectListByKeys(String sql, QueryUtil.Parameter parameter, Class clazz, String keyName) throws ValidException {
         return QueryUtil.selectList(entityManager,sql,parameter,new ObjectResultTransformer(clazz,keyName));
     }
-    public <T> ListResult<T> selectList(String sql, QueryUtil.Parameter parameter, Class clazz) throws ValidException {
+    public <T> ListResult<T> selectListByKeys(String sql, QueryUtil.Parameter parameter, Class clazz) throws ValidException {
         return QueryUtil.selectList(entityManager,sql,parameter,new ObjectResultTransformer(clazz));
     }
 
     public <T> List<T> selectListAndData(String sql, QueryUtil.Parameter parameter, Class clazz) throws ValidException {
-        return (List<T>) selectList(sql,parameter,clazz).getData();
+        return (List<T>) selectListByKeys(sql,parameter,clazz).getData();
     }
 
     public <T> PageResponse<T> selectPageResponse(String sql, QueryUtil.Parameter parameter, PageReq pageQuery, Class clazz) throws ValidException {
@@ -73,22 +72,27 @@ public class QueryFactory {
     public <T> PageResult<T> selectPageAndKeys(String sql, QueryUtil.Parameter parameter, PageReq pageQuery, Class clazz,List<String> keyNames) throws ValidException{
         return QueryUtil.selectPage(entityManager,sql,parameter,pageQuery,new ObjectResultTransformer(clazz,keyNames));
     }
-    public <T> ListResult<T> selectList(Class<? extends BaseEntity> entityClass, QueryParam[] queryParams, Class clazz) throws ValidException {
-        return selectList(entityClass,queryParams,clazz,null);
+    public <T> ListResult<T> selectListByKeys(Class<? extends BaseEntity> entityClass, QueryParam[] queryParams, Class clazz) throws ValidException {
+        return selectListByKeys(entityClass,queryParams,clazz,null);
     }
-    public <T> ListResult<T> selectList(Class<? extends BaseEntity> entityClass, QueryParam[] queryParams, Class clazz, String keyName) throws ValidException {
-        return selectList(entityClass,queryParams,clazz,null,keyName);
+    public <T> ListResult<T> selectListByKeys(Class<? extends BaseEntity> entityClass, QueryParam[] queryParams, Class clazz, String keyName) throws ValidException {
+        return selectListByKeys(entityClass,queryParams,clazz,null,keyName);
     }
     public <T> ListResult<T> selectListSort(Class<? extends BaseEntity> entityClass, QueryParam[] queryParams, Class clazz, QuerySort[] sorts) throws ValidException {
-        return selectList(entityClass,queryParams,clazz,sorts,null);
+        return selectListByKeys(entityClass,queryParams,clazz,sorts,null);
     }
 //    public <T> ListResult<T> selectList(Class<? extends BaseEntity> entityClass, QueryParam[] queryParams, Class clazz, QuerySort[] sorts) throws ValidException {
 //        return selectList(entityClass,queryParams,clazz,sorts,null);
 //    }
-    public <T> ListResult<T> selectList(Class<? extends BaseEntity> entityClass, QueryParam[] queryParams, Class clazz, QuerySort[] sorts, String keyName) throws ValidException {
-        return selectList(entityClass,queryParams,clazz,sorts,null,keyName);
+    public <T> ListResult<T> selectListByKeys(Class<? extends BaseEntity> entityClass, QueryParam[] queryParams, Class clazz, QuerySort[] sorts, String keyName) throws ValidException {
+        return selectListByKeys(entityClass,queryParams,clazz,sorts,null,keyName);
     }
-    public <T> ListResult<T> selectList(Class<? extends BaseEntity> entityClass, QueryParam[] queryParams, Class clazz, QuerySort[] sorts, QueryPage page, String keyName) throws ValidException {
+    public <T> ListResult<T> selectListByKeys(Class<? extends BaseEntity> entityClass, QueryParam[] queryParams, Class clazz, QuerySort[] sorts, QueryPage page, String keyName) throws ValidException {
+        List<String> keyNames = new ArrayList<>();
+        keyNames.add(keyName);
+        return selectListByKeys(entityClass,queryParams,clazz,sorts,page,keyNames);
+    }
+    public <T> ListResult<T> selectListByKeys(Class<? extends BaseEntity> entityClass, QueryParam[] queryParams, Class clazz, QuerySort[] sorts, QueryPage page, List<String> keyNames) throws ValidException {
         Table entity = entityClass.getAnnotation(Table.class);
         if(entity==null){
             throw new ValidException(CoreErrorMessage.QUERY_ENTITY_MAX_HAS_ENTITY_ANNOTATION);
@@ -116,10 +120,9 @@ public class QueryFactory {
             sql += " limit ";
             sql += page.toLimit();
         }
-       return selectList(sql,queryParams,clazz,keyName);
+       return selectListByKeys(sql,queryParams,clazz,keyNames);
     }
-
-    public <T> ListResult<T> selectList(String sql,QueryParam[] queryParams,Class clazz,String keyName) throws ValidException {
+    public <T> ListResult<T> selectListByKeys(String sql, QueryParam[] queryParams, Class clazz, List<String> keys) throws ValidException {
         QueryUtil.Parameter parameter = query -> {
             for(QueryParam queryParam:queryParams){
                 Object value = queryParam.getValue();
@@ -127,19 +130,24 @@ public class QueryFactory {
                 query.setParameter(key,value);
             }
         };
-        return QueryUtil.selectList(entityManager,sql,parameter,new ObjectResultTransformer(clazz,keyName));
+        return QueryUtil.selectList(entityManager,sql,parameter,new ObjectResultTransformer(clazz,keys));
     }
-    public <T> ListResult<T> selectList(String sql,QueryParam[] queryParams,Class clazz) throws ValidException {
-        return selectList(sql,queryParams,clazz,null);
+    public <T> ListResult<T> selectListByKeys(String sql, QueryParam[] queryParams, Class clazz, String keyName) throws ValidException {
+        List<String> keys = new ArrayList<>();
+        keys.add(keyName);
+       return selectListByKeys(sql,queryParams,clazz,keys);
+    }
+    public <T> ListResult<T> selectListByKeys(String sql, QueryParam[] queryParams, Class clazz) throws ValidException {
+        return selectListByKeys(sql,queryParams,clazz,(String)null);
     }
     public <T> List<T> selectListData(Class<? extends BaseEntity> entityClass, QueryParam[] queryParams, Class clazz,String keyName) throws ValidException {
-       return (List<T>) selectList(entityClass,queryParams,clazz,keyName).getData();
+       return (List<T>) selectListByKeys(entityClass,queryParams,clazz,keyName).getData();
     }
     public <T> List<T> selectListData(Class<? extends BaseEntity> entityClass, QueryParam[] queryParams, Class clazz) throws ValidException {
-        return (List<T>) selectList(entityClass,queryParams,clazz).getData();
+        return (List<T>) selectListByKeys(entityClass,queryParams,clazz).getData();
     }
     public <T> T selectOneById(Class<? extends BaseEntity> entityClass, String rowId,Class clazz) throws ValidException {
-        if(!StringUtils.isEmpty(rowId)){
+        if(StringUtils.isEmpty(rowId)){
             return null;
         }
         return selectOne(entityClass,new QueryParam[]{
@@ -149,14 +157,14 @@ public class QueryFactory {
     }
 
     public <T> T selectOne(Class<? extends BaseEntity> selectClass,QueryParam[] queryParams,Class clazz) throws ValidException {
-        ListResult<T> result = selectList(selectClass,queryParams,clazz);
+        ListResult<T> result = selectListByKeys(selectClass,queryParams,clazz);
         List<T> datas = result.getData();
         return CollectionUtils.isEmpty(datas)?null:result.getData().get(0);
     }
 
     public <T> T selectOne(String sql,QueryParam[] queryParams,Class clazz) throws ValidException {
-        ListResult result = selectList(sql,queryParams,clazz);
-        List<T> data = result.getData();
+        ListResult result = selectListByKeys(sql,queryParams,clazz);
+        List<T> data = (List<T>) result.getData();
         if(CollectionUtils.isEmpty(data)){
             return null;
         }
@@ -172,7 +180,7 @@ public class QueryFactory {
         if(CollectionUtils.isEmpty(ids)){
             return null;
         }
-        ListResult<T> studentDtoListResult = selectList(clazz,
+        ListResult<T> studentDtoListResult = selectListByKeys(clazz,
                 new QueryParam[]{
                         QueryParam.notDel(),
                         QueryParam.in(ids)
@@ -189,13 +197,23 @@ public class QueryFactory {
         return selectByInRowIds(sql,dtoClass,queryParams,null);
     }
     public  <T  extends BaseDto> Map<String,T> selectByInRowIds(String sql, Class<T> dtoClass,QueryParam[] queryParams,Callback<T> call) throws ValidException {
-        ListResult<T> listResult =  selectList(sql,queryParams,dtoClass);
+        ListResult<T> listResult =  selectListByKeys(sql,queryParams,dtoClass);
         return listResult.getData().stream().collect(Collectors.toMap(BaseDto::getRowId, t -> {
             if(call!=null) {
                 call.each(t);
             }
             return t;
         }));
+    }
+
+    public  <T  extends BaseDto> Map<String,List<T>> selectGroupByInRowIds(String sql, Class<T> dtoClass, QueryParam[] queryParams) throws ValidException {
+        ListResult<T> listResult =  selectListByKeys(sql,queryParams,dtoClass);
+        return listResult.getData().stream().collect(Collectors.groupingBy(BaseDto::getRowId));
+    }
+
+    public  <T  extends BaseDto> Map<String,List<T>> selectGroupByInRowIds(String sql, Class<T> dtoClass, QueryParam[] queryParams, Function<T,String> function) throws ValidException {
+        ListResult<T> listResult =  selectListByKeys(sql,queryParams,dtoClass);
+        return listResult.getData().stream().collect(Collectors.groupingBy(function));
     }
 
     public static void main(String[] args) throws ValidException {

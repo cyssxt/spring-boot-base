@@ -57,6 +57,24 @@ public abstract class BaseService<T extends BaseEntity, V extends CreateReq, Q e
         }
     }
 
+    public Q infoNotThrow(String contentId){
+        if(StringUtils.isEmpty(contentId)){
+            return null;
+        }
+        Q q = null;
+        try {
+            T t = JpaUtil.get(contentId,getRepository(),true);
+            q = (Q) getDto().newInstance();
+            beforeInfo(q,t);
+            t.parse(q);
+            afterInfo(q,t);
+            return q;
+        } catch (Exception | ValidException e) {
+            e.printStackTrace();
+        }
+        return q;
+    }
+
     public <A extends Q> A info(String contentId,Class<A> commonDto) throws ValidException {
         T t = JpaUtil.get(contentId,getRepository(),true);
         try {
@@ -70,12 +88,13 @@ public abstract class BaseService<T extends BaseEntity, V extends CreateReq, Q e
     }
 
     public ResponseData infoResult(String contentId) throws ValidException {
-       return ResponseData.success(info(contentId));
+        Q q = info(contentId);
+       return ResponseData.success(q);
     }
 
     protected void beforeInfo(Q q,T t){}
 
-    protected void afterInfo(Q q, T t) {}
+    protected void afterInfo(Q q, T t) throws ValidException {}
 
     public interface ParamConstructor{
         void addParam(List<String> params);
@@ -233,9 +252,9 @@ public abstract class BaseService<T extends BaseEntity, V extends CreateReq, Q e
             return;
         }
         Object value = function.apply(w);
-        if(value!=null){
+        if(value!=null && key!=null){
             if(param!=null && param== QueryFunction.Param.LIKE){
-                value = CommonUtil.rightLike(value+"");
+                value = CommonUtil.like(value+"");
             }
             query.setParameter(key,value);
         }

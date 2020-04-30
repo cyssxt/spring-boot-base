@@ -38,16 +38,13 @@ public class QueryUtil {
             query.setFirstResult(offset);
             query.setMaxResults(length);
         }
-        return new ListResult<T>((List<T>)query.getResultList(),keyTransformer.getKeys());
+        return new ListResult<T>((List<T>)query.getResultList(),keyTransformer);
     }
 
     public static <T> List<T> selectList(EntityManager entityManager,String sql,Parameter parameter,Class clazz) throws ValidException {
         return (List<T>) selectList(entityManager,sql,parameter,new ObjectResultTransformer(clazz)).getData();
     }
 
-    public static <T> List<T> selectList(EntityManager entityManager,String sql,Parameter parameter,Class clazz,String keyName) throws ValidException {
-        return selectList(entityManager,sql,parameter,clazz,keyName);
-    }
     public static  <T> PageResult<T> selectPage(EntityManager entityManager, String sql, Parameter parameter, PageReq pageReq, KeyTransformer transformer) throws ValidException {
         Query query = entityManager.createNativeQuery(sql);
         Query countQuery = entityManager.createNativeQuery(String.format("select count(*) totalnum from (%s) A",sql));
@@ -63,7 +60,7 @@ public class QueryUtil {
         query.setFirstResult((pageNo-1)*pageSize);
         query.setMaxResults(pageSize);
         List<T> list = query.getResultList();
-        return new PageResult<T>(new PageResponse<T>(list,pageReq.getPageNo(),pageReq.getPageSize(),total),transformer.getKeys(),transformer.getKeysMap());
+        return new PageResult<T>(new PageResponse<T>(list,pageReq.getPageNo(),pageReq.getPageSize(),total),transformer);
     }
 
     public static  <T> PageResponse<T> selectPage(EntityManager entityManager, String sql, Parameter parameter, PageReq pageReq, Class clazz) throws ValidException {

@@ -6,14 +6,15 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class DateUtil {
-    private final static String YYYYMMDDHHMMSSSSS="yyyyMMddHHmmssSSS";
+    private final static String yyyyMMDDHHMMSSSSS ="yyyyMMddHHmmssSSS";
+    private final static String yyyyMMdd="yyyyMMdd";
     public static Timestamp getCurrentTimestamp(){
         return new Timestamp(new Date().getTime());
     }
 
     public static String getTimeStr() {
         Date date = new Date();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(YYYYMMDDHHMMSSSSS);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(yyyyMMDDHHMMSSSSS);
         return simpleDateFormat.format(date);
     }
 
@@ -31,6 +32,16 @@ public class DateUtil {
     }
 
     public static void main(String[] args) {
-        System.out.println(DateUtil.getDateTimeWithOutTime(new Timestamp(new Date().getTime())));
+        System.out.println(getDayInteger(new Date()));
     }
+
+    public static Integer getDayInteger(Date date) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(yyyyMMdd);
+        String result = simpleDateFormat.format(date);
+        return Integer.valueOf(result);
+    }
+    public static Integer getDayInteger() {
+        return getDayInteger(new Date());
+    }
+
 }
