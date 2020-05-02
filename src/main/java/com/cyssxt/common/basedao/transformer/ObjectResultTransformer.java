@@ -1,8 +1,7 @@
 package com.cyssxt.common.basedao.transformer;
 
-import com.cyssxt.common.filter.DefaultKeyFilter;
 import com.cyssxt.common.filter.KeyFilter;
-import com.cyssxt.common.filter.KeyFilterBean;
+import com.cyssxt.common.filter.KeyFilterView;
 import com.cyssxt.common.reflect.ReflectBean;
 import com.cyssxt.common.reflect.ReflectUtils;
 import org.slf4j.Logger;
@@ -21,8 +20,8 @@ public class ObjectResultTransformer implements KeyTransformer {
     private Set<String> keys = new HashSet<>();
     private Filter filter;
     private String keyName;
-    private List<KeyFilterBean> keyNames;
-    private Map<String,KeyFilterBean> keyFilterBeanMap;
+    private List<KeyFilterView> keyNames;
+    private Map<String, KeyFilterView> keyFilterBeanMap;
 
     private Map<String, Set<String>> keyMap = new HashMap<>();
     public ObjectResultTransformer(final Class<?> resultClass,String keyName) {
@@ -33,10 +32,10 @@ public class ObjectResultTransformer implements KeyTransformer {
         this.keyName = keyName;
     }
 
-    public ObjectResultTransformer(final Class<?> resultClass,List<KeyFilterBean> keyNames) {
+    public ObjectResultTransformer(final Class<?> resultClass,List<KeyFilterView> keyNames) {
         this.resultClass = resultClass;
         this.keyNames = keyNames;
-        this.keyFilterBeanMap = keyNames.stream().collect(Collectors.toMap(KeyFilterBean::getKey,t->t));
+        this.keyFilterBeanMap = keyNames.stream().collect(Collectors.toMap(KeyFilterView::getKey, t->t));
     }
     public ObjectResultTransformer(final Class<?> resultClass, Filter filter) {
         this.resultClass = resultClass;
@@ -84,11 +83,11 @@ public class ObjectResultTransformer implements KeyTransformer {
                     if(!keyFilterBeanMap.containsKey(alias)){
                         continue;
                     }
-                    KeyFilterBean keyFilterBean = keyFilterBeanMap.get(alias);
-                    if(keyFilterBean==null){
+                    KeyFilterView keyFilterView = keyFilterBeanMap.get(alias);
+                    if(keyFilterView ==null){
                         continue;
                     }
-                    KeyFilter keyFilter = keyFilterBean.getFilter();
+                    KeyFilter keyFilter = keyFilterView.getFilter();
                     if(keyFilter!=null && keyFilter.filter(result)){
                         continue;
                     }
@@ -153,10 +152,10 @@ public class ObjectResultTransformer implements KeyTransformer {
         return keyMap;
     }
 
-    public KeyFilterBean getFilter(String key){
-        for(KeyFilterBean keyFilterBean:keyNames){
-            if(key.equals(keyFilterBean.getKey())){
-                return keyFilterBean;
+    public KeyFilterView getFilter(String key){
+        for(KeyFilterView keyFilterView :keyNames){
+            if(key.equals(keyFilterView.getKey())){
+                return keyFilterView;
             }
         }
         return null;
