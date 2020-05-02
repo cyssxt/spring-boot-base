@@ -10,6 +10,8 @@ import com.cyssxt.common.basedao.util.QueryUtil;
 import com.cyssxt.common.dto.BaseDto;
 import com.cyssxt.common.entity.BaseEntity;
 import com.cyssxt.common.exception.ValidException;
+import com.cyssxt.common.filter.KeyFilter;
+import com.cyssxt.common.filter.KeyFilterBean;
 import com.cyssxt.common.model.ListResult;
 import com.cyssxt.common.model.PageResult;
 import com.cyssxt.common.reflect.ReflectUtils;
@@ -309,7 +311,7 @@ public abstract class BaseService<T extends BaseEntity, V extends CreateReq, Q e
      * @return
      */
     public String getSql(W w){return null;}
-    public List getKeys(){return new ArrayList();}
+    public List<KeyFilterBean> getKeys(){return new ArrayList();}
 
     public PageResult<Q> pageItems(W w) throws ValidException {
         String sql = getPageSql(w);
@@ -396,7 +398,7 @@ public abstract class BaseService<T extends BaseEntity, V extends CreateReq, Q e
      * @throws ValidException
      */
     public <P> PageResult<P> pages(W w,Class dto,String sql) throws ValidException {
-        List<String> keys = getKeys();
+        List<KeyFilterBean> keys = getKeys();
         addKeys(keys);
         PageResult<P> page = null;
         if(CollectionUtils.isEmpty(keys)) {
@@ -407,9 +409,8 @@ public abstract class BaseService<T extends BaseEntity, V extends CreateReq, Q e
         return page;
     }
 
-    public void addKeys(List<String> keys){
+    public void addKeys(List<KeyFilterBean> keys){
     }
-
 
     /**
      *

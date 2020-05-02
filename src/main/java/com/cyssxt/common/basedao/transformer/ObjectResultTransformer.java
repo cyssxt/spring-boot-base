@@ -1,5 +1,8 @@
 package com.cyssxt.common.basedao.transformer;
 
+import com.cyssxt.common.filter.DefaultKeyFilter;
+import com.cyssxt.common.filter.KeyFilter;
+import com.cyssxt.common.filter.KeyFilterBean;
 import com.cyssxt.common.reflect.ReflectBean;
 import com.cyssxt.common.reflect.ReflectUtils;
 import org.slf4j.Logger;
@@ -7,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ObjectResultTransformer implements KeyTransformer {
 
@@ -17,7 +21,9 @@ public class ObjectResultTransformer implements KeyTransformer {
     private Set<String> keys = new HashSet<>();
     private Filter filter;
     private String keyName;
-    private List<String> keyNames;
+    private List<KeyFilterBean> keyNames;
+    private Map<String,KeyFilterBean> keyFilterBeanMap;
+
     private Map<String, Set<String>> keyMap = new HashMap<>();
     public ObjectResultTransformer(final Class<?> resultClass,String keyName) {
         this.resultClass = resultClass;
@@ -27,9 +33,10 @@ public class ObjectResultTransformer implements KeyTransformer {
         this.keyName = keyName;
     }
 
-    public ObjectResultTransformer(final Class<?> resultClass,List<String> keyNames) {
+    public ObjectResultTransformer(final Class<?> resultClass,List<KeyFilterBean> keyNames) {
         this.resultClass = resultClass;
         this.keyNames = keyNames;
+        this.keyFilterBeanMap = keyNames.stream().collect(Collectors.toMap(KeyFilterBean::getKey,t->t));
     }
     public ObjectResultTransformer(final Class<?> resultClass, Filter filter) {
         this.resultClass = resultClass;
@@ -48,6 +55,7 @@ public class ObjectResultTransformer implements KeyTransformer {
         try {
             result = this.resultClass.newInstance();
             Map<String, ReflectBean> reflectBeans = ReflectUtils.getBeanMap(resultClass, ReflectUtils.WRITE,true);
+            Map<String,Object> temp = new HashMap<>();
             for (int i=0;i<aliases.length;i++) {
                 Object object = tuple[i];
                 String alias = aliases[i];
@@ -60,16 +68,36 @@ public class ObjectResultTransformer implements KeyTransformer {
                 if(alias.equals(this.keyName) || reflectBean.isKey()){
                     keys.add(object+"");//主键转为string
                 }
-                if(!CollectionUtils.isEmpty(keyNames) && keyNames.contains(alias)){
+                if(!CollectionUtils.isEmpty(keyNames)){
+                    temp.put(alias,object);
+                }
+                if(object!=null) {
+                    ReflectUtils.copyValue(reflectBean, object, result);
+                }
+            }
+            if(!CollectionUtils.isEmpty(temp)){
+                Iterator<Map.Entry<String,Object>> iterator = temp.entrySet().iterator();
+                while (iterator.hasNext()){
+                    Map.Entry<String,Object> entry = iterator.next();
+                    String alias = entry.getKey();
+                    Object object = entry.getValue();
+                    if(!keyFilterBeanMap.containsKey(alias)){
+                        continue;
+                    }
+                    KeyFilterBean keyFilterBean = keyFilterBeanMap.get(alias);
+                    if(keyFilterBean==null){
+                        continue;
+                    }
+                    KeyFilter keyFilter = keyFilterBean.getFilter();
+                    if(keyFilter!=null && keyFilter.filter(result)){
+                        continue;
+                    }
                     Set<String> items = keyMap.get(alias);
                     if(items==null){
                         items = new HashSet<>();
                         keyMap.put(alias,items);
                     }
                     items.add(object+"");
-                }
-                if(object!=null) {
-                    ReflectUtils.copyValue(reflectBean, object, result);
                 }
             }
             if(filter!=null){
@@ -123,5 +151,14 @@ public class ObjectResultTransformer implements KeyTransformer {
     @Override
     public Map<String, Set<String>> getKeysMap() {
         return keyMap;
+    }
+
+    public KeyFilterBean getFilter(String key){
+        for(KeyFilterBean keyFilterBean:keyNames){
+            if(key.equals(keyFilterBean.getKey())){
+                return keyFilterBean;
+            }
+        }
+        return null;
     }
 }

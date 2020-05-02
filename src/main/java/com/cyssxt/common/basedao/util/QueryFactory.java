@@ -9,6 +9,8 @@ import com.cyssxt.common.basedao.view.QueryPage;
 import com.cyssxt.common.dto.BaseDto;
 import com.cyssxt.common.entity.BaseEntity;
 import com.cyssxt.common.exception.ValidException;
+import com.cyssxt.common.filter.KeyFilter;
+import com.cyssxt.common.filter.KeyFilterBean;
 import com.cyssxt.common.model.ListResult;
 import com.cyssxt.common.model.PageResult;
 import com.cyssxt.common.request.PageReq;
@@ -69,7 +71,7 @@ public class QueryFactory {
     public <T> PageResult<T> selectPageAndKeys(String sql, QueryUtil.Parameter parameter, PageReq pageQuery, Class clazz,String keyName) throws ValidException{
         return QueryUtil.selectPage(entityManager,sql,parameter,pageQuery,new ObjectResultTransformer(clazz,keyName));
     }
-    public <T> PageResult<T> selectPageAndKeys(String sql, QueryUtil.Parameter parameter, PageReq pageQuery, Class clazz,List<String> keyNames) throws ValidException{
+    public <T> PageResult<T> selectPageAndKeys(String sql, QueryUtil.Parameter parameter, PageReq pageQuery, Class clazz,List<KeyFilterBean> keyNames) throws ValidException{
         return QueryUtil.selectPage(entityManager,sql,parameter,pageQuery,new ObjectResultTransformer(clazz,keyNames));
     }
     public <T> ListResult<T> selectListByKeys(Class<? extends BaseEntity> entityClass, QueryParam[] queryParams, Class clazz) throws ValidException {
@@ -88,11 +90,11 @@ public class QueryFactory {
         return selectListByKeys(entityClass,queryParams,clazz,sorts,null,keyName);
     }
     public <T> ListResult<T> selectListByKeys(Class<? extends BaseEntity> entityClass, QueryParam[] queryParams, Class clazz, QuerySort[] sorts, QueryPage page, String keyName) throws ValidException {
-        List<String> keyNames = new ArrayList<>();
-        keyNames.add(keyName);
+        List<KeyFilterBean> keyNames = new ArrayList<>();
+        keyNames.add(KeyFilterBean.build(keyName));
         return selectListByKeys(entityClass,queryParams,clazz,sorts,page,keyNames);
     }
-    public <T> ListResult<T> selectListByKeys(Class<? extends BaseEntity> entityClass, QueryParam[] queryParams, Class clazz, QuerySort[] sorts, QueryPage page, List<String> keyNames) throws ValidException {
+    public <T> ListResult<T> selectListByKeys(Class<? extends BaseEntity> entityClass, QueryParam[] queryParams, Class clazz, QuerySort[] sorts, QueryPage page, List<KeyFilterBean> keyNames) throws ValidException {
         Table entity = entityClass.getAnnotation(Table.class);
         if(entity==null){
             throw new ValidException(CoreErrorMessage.QUERY_ENTITY_MAX_HAS_ENTITY_ANNOTATION);
@@ -122,7 +124,7 @@ public class QueryFactory {
         }
        return selectListByKeys(sql,queryParams,clazz,keyNames);
     }
-    public <T> ListResult<T> selectListByKeys(String sql, QueryParam[] queryParams, Class clazz, List<String> keys) throws ValidException {
+    public <T> ListResult<T> selectListByKeys(String sql, QueryParam[] queryParams, Class clazz, List<KeyFilterBean> keys) throws ValidException {
         QueryUtil.Parameter parameter = query -> {
             for(QueryParam queryParam:queryParams){
                 Object value = queryParam.getValue();
@@ -133,8 +135,8 @@ public class QueryFactory {
         return QueryUtil.selectList(entityManager,sql,parameter,new ObjectResultTransformer(clazz,keys));
     }
     public <T> ListResult<T> selectListByKeys(String sql, QueryParam[] queryParams, Class clazz, String keyName) throws ValidException {
-        List<String> keys = new ArrayList<>();
-        keys.add(keyName);
+        List<KeyFilterBean> keys = new ArrayList<>();
+        keys.add(KeyFilterBean.build(keyName));
        return selectListByKeys(sql,queryParams,clazz,keys);
     }
     public <T> ListResult<T> selectListByKeys(String sql, QueryParam[] queryParams, Class clazz) throws ValidException {
