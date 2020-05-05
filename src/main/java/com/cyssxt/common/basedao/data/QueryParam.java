@@ -3,6 +3,7 @@ package com.cyssxt.common.basedao.data;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Set;
 
@@ -34,5 +35,9 @@ public class QueryParam {
     }
     public static QueryParam in(Set<String> rowIds){
         return new QueryParam("row_id",rowIds, QueryExpression.IN);
+    }
+
+    public static QueryParam biggerThan(String time, Timestamp timestamp) {
+        return new QueryParam(time, QueryExpression.BIGGEREUQALTHAN);
     }
 }

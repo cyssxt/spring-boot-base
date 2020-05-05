@@ -5,6 +5,7 @@ public enum QueryExpression {
     EQUAL("="),
     IN(" in "),
     LIKE(" like "),
+    BIGGEREUQALTHAN(" >= "),
     ;
     private String type;
 
