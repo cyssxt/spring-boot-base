@@ -19,7 +19,7 @@ public class QueryParam {
         this.value = value;
     }
 
-    public static QueryParam equal(String key, String value){
+    public static QueryParam equal(String key, Object value){
         return new QueryParam(key,value);
     }
 
