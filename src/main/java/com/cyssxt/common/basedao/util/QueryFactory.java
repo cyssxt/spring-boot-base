@@ -172,20 +172,34 @@ public class QueryFactory {
         return data.get(0);
     }
     public <T  extends BaseDto> Map<String,T> selectByInRowIds(Class<? extends BaseEntity> clazz, Class<T> dtoClass, Set<String> ids) throws ValidException {
-        return selectByInRowIds(clazz,dtoClass,ids,null);
+        return selectMapByInRowIds(clazz,dtoClass,"row_id",ids,null);
     }
-    public <T  extends BaseDto> Map<String,T> selectByInRowIds(Class<? extends BaseEntity> clazz, Class<T> dtoClass, Set<String> ids, Callback<T> call) throws ValidException {
+    public <T  extends BaseDto> Map<String,T> selectByInRowIds(Class<? extends BaseEntity> clazz, Class<T> dtoClass,String keyName, Set<String> ids) throws ValidException {
+        return selectMapByInRowIds(clazz,dtoClass,keyName,ids,null);
+    }
+    public <T  extends BaseDto> ListResult<T> selectListByInRowIds(Class<? extends BaseEntity> clazz, Class<T> dtoClass,String keyName, Set<String> ids) throws ValidException {
         if(dtoClass==null){
             throw new ValidException(CoreErrorMessage.DTO_CLASS_NOT_EXIST);
         }
         if(CollectionUtils.isEmpty(ids)){
+            return new ListResult<>(new ArrayList<T>(),new ObjectResultTransformer(dtoClass));
+        }
+        ListResult<T> listResult = selectListByKeys(clazz,
+                new QueryParam[]{
+                        QueryParam.in(keyName,ids),
+                        QueryParam.notDel()
+                },dtoClass);
+        return listResult;
+    }
+    public <T  extends BaseDto> Map<String,List<T>> selectMapListByInRowIds(Class<? extends BaseEntity> clazz, Class<T> dtoClass,String keyName, Set<String> ids) throws ValidException {
+        List<T> data = selectListByInRowIds(clazz,dtoClass,keyName,ids).getData();
+        return data.stream().collect(Collectors.groupingBy(BaseDto::getRowId));
+    }
+    public <T  extends BaseDto> Map<String,T> selectMapByInRowIds(Class<? extends BaseEntity> clazz, Class<T> dtoClass,String keyName, Set<String> ids, Callback<T> call) throws ValidException {
+        List<T> data = selectListByInRowIds(clazz,dtoClass,keyName,ids).getData();
+        if(CollectionUtils.isEmpty(data)){
             return null;
         }
-        ListResult<T> studentDtoListResult = selectListByKeys(clazz,
-                new QueryParam[]{
-                        QueryParam.in(ids)
-                },dtoClass);
-        List<T> data = studentDtoListResult.getData();
         return data.stream().collect(Collectors.toMap(BaseDto::getRowId, t -> {
             if(call!=null) {
                 call.each(t);

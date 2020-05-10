@@ -33,6 +33,9 @@ public class QueryParam {
     public static QueryParam in(String key,Set<String> rowIds){
         return new QueryParam(key,rowIds, QueryExpression.IN);
     }
+    public static QueryParam in(String key,List<Byte> values){
+        return new QueryParam(key,values, QueryExpression.IN);
+    }
     public static QueryParam in(Set<String> rowIds){
         return new QueryParam("row_id",rowIds, QueryExpression.IN);
     }

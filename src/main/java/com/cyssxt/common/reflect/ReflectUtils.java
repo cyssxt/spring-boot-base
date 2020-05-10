@@ -14,6 +14,8 @@ import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.math.BigInteger;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -294,10 +296,17 @@ public class ReflectUtils {
 //            logger.info("param={},{}", param, type);
             Method method = reflectBean.getMethod();
             try {
-//                System.out.println(method.getName());
+                Parameter[] parameters = method.getParameters();
+                if(parameters!=null && parameters.length>0 && param instanceof BigInteger){
+                    if(parameters[0].getType()==Byte.class ){
+                        param = ((BigInteger) param).byteValue();
+                    }else if(parameters[0].getType()==Integer.class){
+                        param = ((BigInteger) param).intValue();
+                    }
+                }
                 method.invoke(result, param);
             }catch (Exception e){
-                logger.error("{} parse error",method);
+                logger.error("{} parse error {}",method,param);
                 e.printStackTrace();
             }
         }

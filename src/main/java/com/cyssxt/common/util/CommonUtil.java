@@ -8,13 +8,32 @@ import javax.servlet.http.HttpServletRequest;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class CommonUtil {
+
+    public static Integer getAgeByCertId(String certId) {
+        String birthday = "";
+        if (!StringUtils.isEmpty(certId) && certId.length() == 18) {
+            birthday = certId.substring(6, 10) + "/"
+                    + certId.substring(10, 12) + "/"
+                    + certId.substring(12, 14);
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+        Date now = new Date();
+        Date birth = new Date();
+        try {
+            birth = sdf.parse(birthday);
+        } catch (ParseException e) {
+        }
+        long intervalMilli = now.getTime() - birth.getTime();
+        int age = (int) (intervalMilli/(24 * 60 * 60 * 1000))/365;
+//        System.out.println(age);
+        return age;
+    }
 
     public static String uuid() {
         return UUID.randomUUID().toString();
@@ -128,7 +147,7 @@ public class CommonUtil {
     }
 
     public static void main(String[] args) {
-        System.out.println(CommonUtil.random(32));
+        System.out.println(getAgeByCertId("123"));
     }
 
     public static <T> T get(Map<String, T> carDtoMap, String carId) {
@@ -157,4 +176,5 @@ public class CommonUtil {
             return request.getRemoteAddr();
         }
     }
+
 }

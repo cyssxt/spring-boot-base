@@ -513,6 +513,10 @@ public abstract class BaseService<T extends BaseEntity, V extends CreateReq, Q e
     }
 
     public Map<String, Q> queryInRowIds(Set<String> ids, Callback<Q> callback) throws ValidException {
-        return queryFactory.selectByInRowIds(getEntityClass(),getDto(),ids,callback);
+        return queryFactory.selectMapByInRowIds(getEntityClass(),getDto(),"row_id",ids,callback);
+    }
+
+    public Map<String, List<Q>> queryInRowIds(String keyName,Set<String> ids) throws ValidException {
+        return queryFactory.selectMapListByInRowIds(getEntityClass(),getDto(),keyName,ids);
     }
 }
