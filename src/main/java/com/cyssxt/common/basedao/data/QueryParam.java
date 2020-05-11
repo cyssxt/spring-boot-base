@@ -43,4 +43,8 @@ public class QueryParam {
     public static QueryParam biggerThan(String time, Timestamp timestamp) {
         return new QueryParam(time, QueryExpression.BIGGEREUQALTHAN);
     }
+
+//    public static QueryParam notin(String status, List<Byte> notinUseStatus) {
+//        return new QueryParam(status, notinUseStatus);
+//    }
 }
