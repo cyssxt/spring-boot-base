@@ -11,7 +11,7 @@ public class ResponseData<T> {
     String retMsg;
     T data;
     String serviceType;
-    String extra;
+    Object extra;
     List<String> errors;
 
     public static Object fail(ValidException e) {

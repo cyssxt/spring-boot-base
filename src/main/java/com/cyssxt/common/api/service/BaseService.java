@@ -28,6 +28,7 @@ import javax.annotation.Resource;
 import javax.persistence.Column;
 import javax.persistence.Query;
 import javax.persistence.Table;
+import javax.transaction.Transactional;
 import java.util.*;
 import java.util.function.Function;
 
@@ -113,7 +114,7 @@ public abstract class BaseService<T extends BaseEntity, V extends CreateReq, Q e
     public void afterCreate(T t, V v) {
     }
     protected void beforeCreate(T t, V v) throws ValidException {}
-    public void onDel(DelReq req) {
+    public void onDel(DelReq req) throws ValidException {
     }
 
     public void beforeSave(T t, V v) throws ValidException {
@@ -270,6 +271,7 @@ public abstract class BaseService<T extends BaseEntity, V extends CreateReq, Q e
     @Resource
     QueryFactory queryFactory;
 
+    @Transactional(rollbackOn = ValidException.class)
     public ResponseData del(DelReq req) throws ValidException {
         String rowId = req.getItemId();
         if (StringUtils.isEmpty(rowId)) {
@@ -283,6 +285,7 @@ public abstract class BaseService<T extends BaseEntity, V extends CreateReq, Q e
         return ResponseData.success(length);
     }
 
+    @Transactional(rollbackOn = ValidException.class)
     public ResponseData create(V req) throws ValidException {
         T t = newEntity();
         checkParam(req);
@@ -458,6 +461,7 @@ public abstract class BaseService<T extends BaseEntity, V extends CreateReq, Q e
         log.debug("v={}",v);
     }
 
+    @Transactional(rollbackOn = ValidException.class)
     public ResponseData update(V v) throws ValidException {
         String rowId = v.getRowId();
         T t = null;

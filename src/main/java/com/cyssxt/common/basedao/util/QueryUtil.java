@@ -72,4 +72,14 @@ public class QueryUtil {
         List data = result.getData();
         return CollectionUtils.isEmpty(data)?null:result.getData().get(0);
     }
+
+    public static Long count(String sql,EntityManager manager,Parameter parameter){
+        Query countQuery = manager.createNativeQuery(sql);
+        if(parameter!=null){
+            parameter.init(countQuery);
+        }
+        countQuery.unwrap(NativeQueryImpl.class).setResultTransformer(new LongResultTransformer());
+        Long total = (Long)countQuery.getSingleResult();
+        return total;
+    }
 }

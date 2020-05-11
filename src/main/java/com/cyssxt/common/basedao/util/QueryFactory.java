@@ -237,5 +237,7 @@ public class QueryFactory {
     }
 
 
-
+    public Long count(String sql, QueryUtil.Parameter parameter) {
+        return QueryUtil.count(sql,entityManager,parameter);
+    }
 }
