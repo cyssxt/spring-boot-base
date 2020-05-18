@@ -1,5 +1,6 @@
 package com.cyssxt.common.api.controller;
 
+import com.cyssxt.common.annotation.Alias;
 import com.cyssxt.common.annotation.Authorization;
 import com.cyssxt.common.annotation.valid.AuthorizationValidator;
 import com.cyssxt.common.annotation.valid.impl.BaseApiValidator;
@@ -17,7 +18,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +34,7 @@ public abstract class BaseController<T extends BaseEntity, V extends CreateReq, 
     protected final static String DEL = "del";
 
     public abstract BaseService getCommonService();
+
     public interface AuthorizationConfig{
         Map<String,Class<? extends AuthorizationValidator>> getAuthorizations();
     }

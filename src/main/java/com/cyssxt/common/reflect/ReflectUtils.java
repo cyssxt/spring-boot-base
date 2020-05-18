@@ -15,6 +15,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Blob;
 import java.sql.SQLException;
@@ -297,11 +298,30 @@ public class ReflectUtils {
             Method method = reflectBean.getMethod();
             try {
                 Parameter[] parameters = method.getParameters();
-                if(parameters!=null && parameters.length>0 && param instanceof BigInteger){
-                    if(parameters[0].getType()==Byte.class ){
-                        param = ((BigInteger) param).byteValue();
-                    }else if(parameters[0].getType()==Integer.class){
-                        param = ((BigInteger) param).intValue();
+                if(parameters!=null && parameters.length>0){
+                    if(param instanceof BigInteger) {
+                        if (parameters[0].getType() == Byte.class) {
+                            param = ((BigInteger) param).byteValue();
+                        } else if (parameters[0].getType() == Integer.class) {
+                            param = ((BigInteger) param).intValue();
+                        }else if (parameters[0].getType() == Long.class) {
+                            param = ((BigInteger) param).longValue();
+                        }
+                    }else if(param instanceof String){
+                        if (parameters[0].getType() == Byte.class) {
+                            param =Byte.valueOf((String)param);
+                        }
+                        if (parameters[0].getType() == Integer.class) {
+                            param =Integer.valueOf((String)param);
+                        }else if (parameters[0].getType() == Long.class) {
+                            param = Long.valueOf((String)param);
+                        }
+                    }else if(param instanceof BigDecimal){
+                        if (parameters[0].getType() == Integer.class) {
+                            param =((BigDecimal) param).intValue();
+                        }else if (parameters[0].getType() == Long.class) {
+                            param = ((BigDecimal) param).longValue();
+                        }
                     }
                 }
                 method.invoke(result, param);
