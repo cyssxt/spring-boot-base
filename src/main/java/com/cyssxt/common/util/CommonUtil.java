@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -88,18 +89,27 @@ public class CommonUtil {
         }
         return buffer.toString();
     }
-
-    public static String randomInt(int length) {
+    public static String randomInt(int length){
+        return randomInt(length,false);
+    }
+    public static String randomInt(int length,boolean startNotWithZero) {
         StringBuffer buffer = new StringBuffer();
         int total = INT_CODES_LENGTH;
         for (int i = 0; i < length; i++) {
             Random random = new Random();
             int index = random.nextInt(total);
+            if(index==0 && startNotWithZero){
+                index = 1;
+            }
             buffer.append(INT_CODES[index]);
         }
         return buffer.toString();
     }
 
+    public static Integer randomIntOfInt(int length) {
+        String value = randomInt(length,true);
+        return Integer.valueOf(value);
+    }
     /**
      * 判断对象为空
      *
@@ -177,4 +187,7 @@ public class CommonUtil {
         }
     }
 
+    public static Timestamp getCurrentTimestamp() {
+        return new Timestamp(new Date().getTime());
+    }
 }
