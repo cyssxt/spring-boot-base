@@ -224,9 +224,9 @@ public abstract class BaseService<T extends BaseEntity, V extends CreateReq, Q e
     }
 
 
-    protected abstract void onListQuery(W w, String sql);
+    protected void onListQuery(W w, String sql){};
 
-    protected abstract void onPageQuery(W w, String sql);
+    protected void onPageQuery(W w, String sql){};
 
     public abstract Class getDto();
 
