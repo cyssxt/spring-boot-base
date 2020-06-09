@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
+import java.math.BigInteger;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -104,6 +106,27 @@ public class RedisUtil {
     public boolean clear(String key){
         return this.stringRedisTemplate.delete(key);
     }
+    public long getNumber(String key){
+        return getNumber(key,0L);
+    }
+    public long getNumber(String key,long defaultValue){
+        String value = getStringValue(key);
+        long result = Optional.ofNullable(defaultValue).orElse(0L);
+        try{
+            result = Long.valueOf(value);
+        }catch (Exception e){
 
+        }
+        return result;
+    }
 
+    public Long getNumberWithOutDefault(String key,long defaultValue){
+        String value = getStringValue(key);
+        try{
+            return Long.valueOf(value);
+        }catch (Exception e){
+
+        }
+        return null;
+    }
 }

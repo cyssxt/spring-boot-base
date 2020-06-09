@@ -89,7 +89,7 @@ public class RequestAop {
             token = request.getHeader(HttpHeaders.AUTHORIZATION);
             if (!StringUtils.isEmpty(token)) {
                 if (!token.startsWith("Bearer ")) {
-                    throw new ValidException(CoreErrorMessage.AUTHORIZATION_ERROR);
+                    token=null;
                 } else {
                     token = token.replace("Bearer ", "").trim();
                     if (StringUtils.isEmpty(token)) {

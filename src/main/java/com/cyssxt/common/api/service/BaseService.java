@@ -98,6 +98,7 @@ public abstract class BaseService<T extends BaseEntity, V extends CreateReq, Q e
 
     protected void afterInfo(Q q, T t) throws ValidException {}
 
+
     public interface ParamConstructor{
         void addParam(List<String> params);
         void setParameters(Query query);
