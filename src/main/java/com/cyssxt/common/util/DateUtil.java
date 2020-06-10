@@ -9,6 +9,7 @@ public class DateUtil {
     private final static String yyyyMMDDHHMMSSSSS ="yyyyMMddHHmmssSSS";
     private final static String yyyyMMdd="yyyyMMdd";
     private final static String HHmm="HH:mm";
+    private final static String HHMN="HHmm";
     public static Timestamp getCurrentTimestamp(){
         return new Timestamp(new Date().getTime());
     }
@@ -49,4 +50,25 @@ public class DateUtil {
         return getDayInteger(new Date());
     }
 
+    public static Integer getTimeInteger(Date date) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(HHMN);
+        String result = simpleDateFormat.format(date);
+        return Integer.valueOf(result);
+    }
+
+    public static Integer getTimeInteger(Integer hour,Integer minute) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY,hour);
+        calendar.set(Calendar.MINUTE,minute);
+        return getTimeInteger(calendar.getTime());
+    }
+
+    public static Date getTime(Integer hour, Integer minute) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY,hour);
+        calendar.set(Calendar.MINUTE,minute);
+        calendar.set(Calendar.SECOND,0);
+        calendar.set(Calendar.MILLISECOND,0);
+        return calendar.getTime();
+    }
 }

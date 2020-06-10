@@ -318,6 +318,8 @@ public class ReflectUtils {
                             param =Integer.valueOf((String)param);
                         }else if (parameters[0].getType() == Long.class) {
                             param = Long.valueOf((String)param);
+                        }else if (parameters[0].getType() == BigDecimal.class) {
+                            param = new BigDecimal((String) param);
                         }
                     }else if(param instanceof BigDecimal){
                         if (parameters[0].getType() == Integer.class) {
