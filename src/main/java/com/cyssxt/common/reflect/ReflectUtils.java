@@ -113,6 +113,7 @@ public class ReflectUtils {
             String name = field.getName();
             map.put(name, field);
         }
+        fieldMap.put(clazz,map);
         return map;
     }
 
@@ -232,15 +233,17 @@ public class ReflectUtils {
         }
         return result;
     }
-
-    public static void copyValue(ReflectBean reflectBean, Object object, Object result) {
-        Class type = reflectBean.getFieldType();
+    public static void copyValue(ReflectBean bean, Object value, Object instance){
+        copyValue(bean.getMethod(),bean.getFieldType(),value,instance);
+    }
+    public static void copyValue(Method method,Class type, Object value, Object instance) {
+//        Class type = reflectBean.getFieldType();
 //        logger.info("copyValue,key={}", object + "");
-        Object param = object;
+        Object param = value;
 
-        if (object != null) {
-            if(type.equals(param.getClass())) {
-                String obj = object + "";
+        if (value != null) {
+                if(type.equals(param.getClass())) {
+                String obj = value + "";
                 if (!StringUtils.isEmpty(obj.trim())) {
                     if (type.equals(Boolean.class) || type.equals(boolean.class)) {
                         param = "1".equals(obj) ? true : "true".equals(obj) ? true : Boolean.valueOf(obj);
@@ -278,7 +281,7 @@ public class ReflectUtils {
                         }
                     } else if (type.equals(Blob.class)) {
                         try {
-                            param = new SerialBlob((byte[]) object);
+                            param = new SerialBlob((byte[]) value);
                         } catch (SQLException e) {
                             e.printStackTrace();
                         }
@@ -288,14 +291,14 @@ public class ReflectUtils {
                     }
                 } else {
                     if (type.equals(String.class)) {
-                        param = object;
+                        param = value;
                     } else {
                         param = null;
                     }
                 }
             }
 //            logger.info("param={},{}", param, type);
-            Method method = reflectBean.getMethod();
+//            Method method = reflectBean.getMethod();
             try {
                 Parameter[] parameters = method.getParameters();
                 if(parameters!=null && parameters.length>0){
@@ -324,7 +327,7 @@ public class ReflectUtils {
                         }
                     }
                 }
-                method.invoke(result, param);
+                method.invoke(instance, param);
             }catch (Exception e){
                 logger.error("{} parse error {}",method,param);
                 e.printStackTrace();

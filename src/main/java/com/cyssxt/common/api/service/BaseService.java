@@ -99,6 +99,7 @@ public abstract class  BaseService<T extends BaseEntity, V extends CreateReq, Q 
 
     protected void afterInfo(Q q, T t) throws ValidException {}
 
+
     public interface ParamConstructor{
         void addParam(List<String> params);
         void setParameters(Query query);
@@ -225,9 +226,9 @@ public abstract class  BaseService<T extends BaseEntity, V extends CreateReq, Q 
     }
 
 
-    protected abstract void onListQuery(W w, String sql);
+    protected void onListQuery(W w, String sql){};
 
-    protected abstract void onPageQuery(W w, String sql);
+    protected void onPageQuery(W w, String sql){};
 
     public abstract Class getDto();
 

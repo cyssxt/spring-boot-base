@@ -169,6 +169,10 @@ public class CommonUtil {
         return obj != null && obj;
     }
 
+    public static boolean isFalse(Boolean obj) {
+        return obj == null && !obj;
+    }
+
     public static void main(String[] args) {
         System.out.println(getAgeByCertId("123"));
     }
