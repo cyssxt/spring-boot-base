@@ -513,6 +513,10 @@ public abstract class BaseService<T extends BaseEntity, V extends CreateReq, Q e
         return querySorts;
     }
 
+    public T findByRowId(String contentId) throws ValidException {
+        return JpaUtil.get(contentId,getRepository(),CoreErrorMessage.ITEM_NOT_FOUND);
+    }
+
     public Map<String, Q> queryInRowIds(Set<String> ids) throws ValidException {
         return queryFactory.selectByInRowIds(getEntityClass(), getDto(),ids);
     }
