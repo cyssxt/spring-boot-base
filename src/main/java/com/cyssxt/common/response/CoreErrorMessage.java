@@ -16,7 +16,7 @@ public enum CoreErrorMessage implements ErrorMessage{
     COPY_ERROR(10000012, "拷贝异常"),
     CODE_NOT_EXIST(10000013,"验证码不存在" ),
     TOKEN_NOT_VALID(10000014, "token无效"),
-    USER_ID_NOT_NULL(10000015, "暂未登录"),
+    USER_ID_NOT_NULL(10000015, "暂未登录或用户已被删除"),
     SHOULD_LOGIN(10000016, "请先登录"),
     PARAM_ERROR(10000017, "参数错误"),
     AUTHORIZATION_ERROR(10000018, "Authorization头错误"),

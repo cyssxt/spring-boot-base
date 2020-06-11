@@ -21,6 +21,7 @@ import com.cyssxt.common.request.SortParam;
 import com.cyssxt.common.response.CoreErrorMessage;
 import com.cyssxt.common.response.ResponseData;
 import com.cyssxt.common.util.CommonUtil;
+import com.cyssxt.common.util.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -40,7 +41,7 @@ import java.util.function.Function;
  * @param <W> 分页请求参数
  */
 @Slf4j
-public abstract class BaseService<T extends BaseEntity, V extends CreateReq, Q extends BaseDto, W extends PageReq> {
+public abstract class  BaseService<T extends BaseEntity, V extends CreateReq, Q extends BaseDto, W extends PageReq> {
 
 
     public abstract BaseRepository getRepository();
@@ -269,6 +270,10 @@ public abstract class BaseService<T extends BaseEntity, V extends CreateReq, Q e
         }
     }
 
+    public void beforeDel(T t){
+
+    }
+
     @Resource
     QueryFactory queryFactory;
 
@@ -278,12 +283,13 @@ public abstract class BaseService<T extends BaseEntity, V extends CreateReq, Q e
         if (StringUtils.isEmpty(rowId)) {
             throw new ValidException(CoreErrorMessage.ITEM_ID_NOT_NULL);
         }
-        int length = getRepository().del(rowId);
-        if (length == 0) {
-            throw new ValidException(CoreErrorMessage.ITEM_NOT_FOUND);
-        }
+        T t = JpaUtil.get(rowId,getRepository(),CoreErrorMessage.ITEM_NOT_FOUND);
+        beforeDel(t);
+        t.setDelFlag(true);
+        t.setUpdateTime(DateUtil.getCurrentTimestamp());
+        getRepository().save(t);
         onDel(req);
-        return ResponseData.success(length);
+        return ResponseData.success();
     }
 
     @Transactional(rollbackOn = ValidException.class)
