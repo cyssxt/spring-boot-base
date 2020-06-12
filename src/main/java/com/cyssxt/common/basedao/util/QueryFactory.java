@@ -172,6 +172,9 @@ public class QueryFactory {
         return data.get(0);
     }
     public <T  extends BaseDto> Map<String,T> selectByInRowIds(Class<? extends BaseEntity> clazz, Class<T> dtoClass, Set<String> ids) throws ValidException {
+        if(CollectionUtils.isEmpty(ids)){
+            return null;
+        }
         return selectMapByInRowIds(clazz,dtoClass,"row_id",ids,null);
     }
     public <T  extends BaseDto> Map<String,T> selectByInRowIds(Class<? extends BaseEntity> clazz, Class<T> dtoClass,String keyName, Set<String> ids) throws ValidException {
