@@ -8,6 +8,7 @@ import com.cyssxt.common.model.ListResult;
 import com.cyssxt.common.model.PageResult;
 import com.cyssxt.common.request.PageReq;
 import com.cyssxt.common.response.PageResponse;
+import org.hibernate.query.NativeQuery;
 import org.hibernate.query.internal.NativeQueryImpl;
 import org.springframework.util.CollectionUtils;
 
@@ -33,7 +34,7 @@ public class QueryUtil {
         if(parameter!=null){
             parameter.init(query);
         }
-        query.unwrap(NativeQueryImpl.class).setResultTransformer(keyTransformer);
+        query.unwrap(NativeQuery.class).setResultTransformer(keyTransformer);
         if(ALL!=length) {
             query.setFirstResult(offset);
             query.setMaxResults(length);
