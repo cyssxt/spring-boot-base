@@ -294,6 +294,10 @@ public abstract class  BaseService<T extends BaseEntity, V extends CreateReq, Q 
 
     @Transactional(rollbackOn = ValidException.class)
     public ResponseData create(V req) throws ValidException {
+        String rowId = req.getRowId();
+        if(StringUtils.isEmpty(rowId)){
+            req.setRowId(null);
+        }
         T t = newEntity();
         checkParam(req);
         req.parse(t);
