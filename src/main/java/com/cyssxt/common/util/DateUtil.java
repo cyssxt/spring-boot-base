@@ -63,7 +63,14 @@ public class DateUtil {
         return getTimeInteger(calendar.getTime());
     }
 
-    public static Date getTime(Integer hour, Integer minute) {
+    public static Integer getTimeInteger(Byte hour,Byte minute) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY,hour);
+        calendar.set(Calendar.MINUTE,minute);
+        return getTimeInteger(calendar.getTime());
+    }
+
+    public static Date getTime(Byte hour, Byte minute) {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY,hour);
         calendar.set(Calendar.MINUTE,minute);
