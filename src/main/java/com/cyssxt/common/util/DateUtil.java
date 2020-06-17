@@ -64,6 +64,9 @@ public class DateUtil {
     }
 
     public static Integer getTimeInteger(Byte hour,Byte minute) {
+        if(hour==null || minute==null){
+            return null;
+        }
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY,hour);
         calendar.set(Calendar.MINUTE,minute);
@@ -71,6 +74,9 @@ public class DateUtil {
     }
 
     public static Date getTime(Byte hour, Byte minute) {
+        if(hour==null || minute==null){
+            return null;
+        }
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY,hour);
         calendar.set(Calendar.MINUTE,minute);

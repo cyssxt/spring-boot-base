@@ -99,6 +99,10 @@ public abstract class  BaseService<T extends BaseEntity, V extends CreateReq, Q 
 
     protected void afterInfo(Q q, T t) throws ValidException {}
 
+    public T check(String contentId) throws ValidException {
+        return JpaUtil.get(contentId,getRepository(),CoreErrorMessage.ITEM_NOT_FOUND);
+    }
+
 
     public interface ParamConstructor{
         void addParam(List<String> params);
