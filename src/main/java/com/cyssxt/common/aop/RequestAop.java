@@ -43,6 +43,7 @@ public class RequestAop {
     private static final String USER_TYPE = "userType";
     private static final String USER_ID = "userId";
     private static final String USER = "user";
+    public static ThreadLocal<String> CURRENT_USER = new ThreadLocal<>();
 //    private static final String SIGN_KEY = "signKey";
 
 
@@ -153,6 +154,7 @@ public class RequestAop {
                 throw new ValidException(CoreErrorMessage.USER_ID_NOT_NULL);
             }
             userId = userId.split("_")[0];
+            CURRENT_USER.set(userId);
             userInfo = userService.findById(userId);
             userType = userInfo.getType();
             if (validatorClass != null) {

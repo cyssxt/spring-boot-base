@@ -233,6 +233,7 @@ public abstract class  BaseService<T extends BaseEntity, V extends CreateReq, Q 
     protected void onListQuery(W w, String sql){};
 
     protected void onPageQuery(W w, String sql){};
+    protected void beforePageQuery(W w, String sql){};
 
     public abstract Class getDto();
 
@@ -333,6 +334,7 @@ public abstract class  BaseService<T extends BaseEntity, V extends CreateReq, Q 
     public PageResult<Q> pageItems(W w) throws ValidException {
         String sql = getPageSql(w);
         PageResult page;
+        beforePageQuery(w,sql);
         if(StringUtils.isEmpty(sql)) {
             sql = getFullQuerySql(w);
             log.debug("pageItem sql={}", sql);

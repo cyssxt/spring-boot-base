@@ -84,4 +84,9 @@ public class DateUtil {
         calendar.set(Calendar.MILLISECOND,0);
         return calendar.getTime();
     }
+
+    public static long getDaysBetween(Date one, Date two) {
+        long difference =  (one.getTime()-two.getTime())/86400000;
+        return Math.abs(difference);
+    }
 }
