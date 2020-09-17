@@ -201,7 +201,10 @@ public abstract class  BaseService<T extends BaseEntity, V extends CreateReq, Q 
                     sortParams.add(String.format("%s %s", querySort.getFieldName(), querySort.getType()));
                 }
             }
-            sql += " order by "+String.join(",",sortParams);
+            String order = String.join(",",sortParams);
+            if (!StringUtils.isEmpty(order) && "".equals(order.trim())){
+                sql += " order by "+order;
+            }
         }
         log.debug("query url={}",sql);
         return sql;
