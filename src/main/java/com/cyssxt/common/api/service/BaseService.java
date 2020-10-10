@@ -202,7 +202,7 @@ public abstract class  BaseService<T extends BaseEntity, V extends CreateReq, Q 
                 }
             }
             String order = String.join(",",sortParams);
-            if (!StringUtils.isEmpty(order) && "".equals(order.trim())){
+            if (!StringUtils.isEmpty(order) && !"".equals(order.trim())){
                 sql += " order by "+order;
             }
         }
