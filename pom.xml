@@ -9,8 +9,8 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.cyssxt</groupId>
-    <artifactId>common</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <artifactId>spring-boot-base</artifactId>
+    <version>1.0.1</version>
     <name>common</name>
     <packaging>jar</packaging>
     <description>Demo project for Spring Boot</description>
