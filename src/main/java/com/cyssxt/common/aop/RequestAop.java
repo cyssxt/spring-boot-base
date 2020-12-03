@@ -57,9 +57,6 @@ public class RequestAop {
     @Resource
     CommonUserService userService;
 
-    /**
-     * 接口拦截
-     */
     @Around("pointCut()")
     public Object around(ProceedingJoinPoint pjp) throws ValidException {
         MethodSignature methodSignature = (MethodSignature) pjp.getSignature();

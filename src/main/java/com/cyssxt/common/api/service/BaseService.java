@@ -327,10 +327,6 @@ public abstract class  BaseService<T extends BaseEntity, V extends CreateReq, Q 
     }
 
 
-    /**
-     * 列表sql
-     * @return
-     */
     public String getSql(W w){return null;}
     public List<KeyFilterView> getKeys(){return new ArrayList();}
 
@@ -370,26 +366,18 @@ public abstract class  BaseService<T extends BaseEntity, V extends CreateReq, Q 
         return list;
     }
 
-    /**
-     *
-     * @param w 分页请求参数
-     * @param dto 视图
-     * @param <P>
-     * @return
-     * @throws ValidException
-     */
+
     public <P> ListResult<P> list(W w,Class dto) throws ValidException {
         String sql = getFullQuerySql(w);
         return list(w,dto,sql);
     }
 
     /**
-     *
      * @param w 分页请求参数
-     * @param dto 视图
-     * @param <P> 返回分页请求结果集
-     * @return
-     * @throws ValidException
+     * @param dto 视图类
+     * @param <P> 范性接口
+     * @return 返回分页结果数据
+     * @throws ValidException 查询失败异常
      */
     public <P> PageResult<P> pages(W w,Class dto) throws ValidException {
         String sql = getFullQuerySql(w);
@@ -401,9 +389,9 @@ public abstract class  BaseService<T extends BaseEntity, V extends CreateReq, Q 
      * @param w 分页请求参数
      * @param dto 返回视图
      * @param sql sql语句
-     * @param <P>
-     * @return
-     * @throws ValidException
+     * @param <P> 分页结果范型
+     * @return 返回列表数据
+     * @throws ValidException 查询失败异常
      */
     public <P> ListResult<P> list(W w,Class dto,String sql) throws ValidException {
         ListResult list = queryFactory.selectListAndKeys(sql, getQueryParameter(w),dto);
@@ -415,9 +403,9 @@ public abstract class  BaseService<T extends BaseEntity, V extends CreateReq, Q 
      * @param w 分页请求参数
      * @param dto 分页视图
      * @param sql 执行的sql语句
-     * @param <P>
-     * @return
-     * @throws ValidException
+     * @param <P> 分页结果范型
+     * @return 返回分页结果数据
+     * @throws ValidException 查询结果异常
      */
     public <P> PageResult<P> pages(W w,Class dto,String sql) throws ValidException {
         List<KeyFilterView> keys = getKeys();
@@ -434,27 +422,16 @@ public abstract class  BaseService<T extends BaseEntity, V extends CreateReq, Q 
     public void addKeys(List<KeyFilterView> keys){
     }
 
-    /**
-     *
-     * @param w
-     * @param dto
-     * @param sql
-     * @param key
-     * @param <P>
-     * @return
-     * @throws ValidException
-     */
     public <P> PageResult<P> pages(W w, Class dto, String sql, String key) throws ValidException {
         PageResult<P> page = queryFactory.selectPageAndKeys(sql, getQueryParameter(w),w,dto,key);
         return page;
     }
 
     /**
-     * 返回列表结果集
-     * @param keys 主键列表值
-     * @param paramConstructor 构造参数请求
-     * @return
-     * @throws ValidException
+     * @param keys 分组key
+     * @param paramConstructor 查询构造接口
+     * @return 列表结果集
+     * @throws ValidException 查询失败异常
      */
     public ListResult<Q> itemsByIds(List<String> keys, ParamConstructor paramConstructor) throws ValidException {
         if(CollectionUtils.isEmpty(keys)){
