@@ -5,12 +5,12 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.2.6.RELEASE</version>
+        <version>2.3.4.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.cyssxt</groupId>
     <artifactId>spring-boot-base</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.3</version>
     <name>common</name>
     <packaging>jar</packaging>
     <description>Demo project for Spring Boot</description>
@@ -26,6 +26,11 @@
         </developer>
     </developers>
     <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/com.belerweb/pinyin4j -->
         <dependency>
             <groupId>com.belerweb</groupId>

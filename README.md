@@ -1,4 +1,8 @@
 # spring-boot-base
+1. 在启动的Application增加包扫描
+<pre><code>
+@SpringBootApplication(scanBasePackages = {"com.cyssxt"})
+</code></pre>
 这个组件帮助我们迅速开发基于spring boot的api服务。
 <font face="#ff0000">  
     PS: 本框架通用消息体为

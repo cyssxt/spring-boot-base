@@ -170,7 +170,7 @@ public class CommonUtil {
     }
 
     public static boolean isFalse(Boolean obj) {
-        return obj == null && !obj;
+        return obj == null || !obj;// fixed false param
     }
 
     public static void main(String[] args) {

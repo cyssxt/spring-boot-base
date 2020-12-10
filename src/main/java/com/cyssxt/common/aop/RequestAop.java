@@ -10,6 +10,7 @@ import com.cyssxt.common.dto.UserInfo;
 import com.cyssxt.common.exception.ValidException;
 import com.cyssxt.common.request.BaseReq;
 import com.cyssxt.common.response.CoreErrorMessage;
+import com.cyssxt.common.util.ErrorUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -59,6 +60,7 @@ public class RequestAop {
 
     @Around("pointCut()")
     public Object around(ProceedingJoinPoint pjp) throws ValidException {
+        CURRENT_USER.set(null);//防止线程重用 导致线程数据错乱
         MethodSignature methodSignature = (MethodSignature) pjp.getSignature();
         Object[] objects = pjp.getArgs();
         Method method = methodSignature.getMethod();
@@ -103,28 +105,13 @@ public class RequestAop {
 
         Parameter[] parameters = method.getParameters();
         int length = parameters.length;
-        List<String> errors = new ArrayList<>();
         for (int i = 0; i < length; i++) {
             Object param = objects[i];
             if (param instanceof BaseReq && !StringUtils.isEmpty(token)) {
                 ((BaseReq) param).setSessionId(token);
             }
             if (param instanceof BindingResult) {
-                BindingResult bindingResult = (BindingResult) objects[i];
-                if (bindingResult.hasErrors()) {
-                    List<FieldError> fieldErrors = bindingResult.getFieldErrors();
-                    fieldErrors.forEach(fieldError -> {
-                        //日志打印不符合校验的字段名和错误提示
-                        log.error("error field is : {} ,message is : {}", fieldError.getField(), fieldError.getDefaultMessage());
-                    });
-                    for (int j = 0; j < fieldErrors.size(); j++) {
-                        FieldError fieldError = fieldErrors.get(j);
-                        //控制台打印不符合校验的字段名和错误提示
-//                        System.out.println("error field is :"+fieldErrors.get(i).getField()+",message is :"+fieldErrors.get(i).getDefaultMessage());
-                        errors.add(String.format("%s:%s", fieldError.getField(), fieldError.getDefaultMessage()));
-                    }
-                    throw new ValidException(CoreErrorMessage.PARAM_ERROR, errors);
-                }
+                ErrorUtils.checkErrors((BindingResult)param);
                 break;
             }
         }
@@ -140,7 +127,7 @@ public class RequestAop {
                     validatorClass = null;
                 }
             }
-            if (StringUtils.isEmpty(token) && validatorClass!=null) {
+            if (StringUtils.isEmpty(token) && validatorClass==null) {
                 throw new ValidException(CoreErrorMessage.SHOULD_LOGIN);
             }
             userId = userService.getUserId(token);
