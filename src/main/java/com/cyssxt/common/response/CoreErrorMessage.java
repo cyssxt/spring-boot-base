@@ -22,7 +22,9 @@ public enum CoreErrorMessage implements ErrorMessage{
     AUTHORIZATION_ERROR(10000018, "Authorization头错误"),
     VALIDATOR_INIT_ERROR(10000019, "校验器处理失败"),
     MD5_NOT_EXIST(10000020, "算法不存在"),
-    DTO_CLASS_NOT_EXIST(10000021, "视图类不存在");
+    DTO_CLASS_NOT_EXIST(10000021, "视图类不存在"),
+    FIELD_IS_NULL(10000022, "字段名不能为空"),
+    FIELD_NOT_EXIST_WRITE_METHOD(10000023, "字段不存在对应的写方法");
     private Integer retCode;
     private String msg;
     private int status=200;

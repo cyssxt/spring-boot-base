@@ -234,107 +234,90 @@ public class ReflectUtils {
         return result;
     }
     public static void copyValue(ReflectBean bean, Object value, Object instance){
-        copyValue(bean.getMethod(),bean.getFieldType(),value,instance);
+        copyValue(bean.getMethod(),value,instance);
     }
-    public static void copyValue(Method method,Class type, Object value, Object instance) {
-//        Class type = reflectBean.getFieldType();
-//        logger.info("copyValue,key={}", object + "");
-        Object param = value;
 
-        if (value != null) {
-                if(type.equals(param.getClass())) {
-                String obj = value + "";
-                if (!StringUtils.isEmpty(obj.trim())) {
-                    if (type.equals(Boolean.class) || type.equals(boolean.class)) {
-                        param = "1".equals(obj) ? true : "true".equals(obj) ? true : Boolean.valueOf(obj);
-                    } else if (type.equals(Integer.class) || type.equals(int.class)) {
-                        param = Integer.valueOf(obj);
-                    } else if (type.equals(Double.class) || type.equals(double.class)) {
-                        param = Double.valueOf(obj);
-                    } else if (type.equals(Float.class) || type.equals(float.class)) {
-                        param = Float.valueOf(obj);
-                    } else if (type.equals(Long.class) || type.equals(Long.class)) {
-                        param = Long.valueOf(obj);
-                    } else if (type.equals(Date.class)) {
-                        if (param instanceof Timestamp) {
-                            param = new Date(Timestamp.valueOf(obj).getTime());
-                        } else {
-                            if (CommonUtil.isInteger(obj)) {
-                                param = new Date(Long.valueOf(obj));
-                            } else {
-                                param = new Date(obj);
-                            }
-                        }
-                    } else if (type.equals(Timestamp.class)) {
-                        if (CommonUtil.isInteger(obj)) {
-                            param = new Timestamp(Long.valueOf(obj));
-                        } else {
-                            param = Timestamp.valueOf(obj);
-                        }
-                    } else if (type.equals(Byte.class) || type.equals(byte.class)) {
-                        if ("false".equals(obj)) {
-                            param = (byte) 0;
-                        } else if ("true".equals(obj)) {
-                            param = (byte) 1;
-                        } else {
-                            param = Byte.valueOf(obj);
-                        }
-                    } else if (type.equals(Blob.class)) {
-                        try {
-                            param = new SerialBlob((byte[]) value);
-                        } catch (SQLException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    if (type.equals(String.class)) {
-                        param = obj;
-                    }
-                } else {
-                    if (type.equals(String.class)) {
-                        param = value;
-                    } else {
-                        param = null;
-                    }
-                }
-            }
-//            logger.info("param={},{}", param, type);
-//            Method method = reflectBean.getMethod();
-            try {
-                Parameter[] parameters = method.getParameters();
-                if(parameters!=null && parameters.length>0){
-                    if(param instanceof BigInteger) {
-                        if (parameters[0].getType() == Byte.class) {
-                            param = ((BigInteger) param).byteValue();
-                        } else if (parameters[0].getType() == Integer.class) {
-                            param = ((BigInteger) param).intValue();
-                        }else if (parameters[0].getType() == Long.class) {
-                            param = ((BigInteger) param).longValue();
-                        }
-                    }else if(param instanceof String){
-                        if (parameters[0].getType() == Byte.class) {
-                            param =Byte.valueOf((String)param);
-                        }
-                        if (parameters[0].getType() == Integer.class) {
-                            param =Integer.valueOf((String)param);
-                        }else if (parameters[0].getType() == Long.class) {
-                            param = Long.valueOf((String)param);
-                        }else if (parameters[0].getType() == BigDecimal.class) {
-                            param = new BigDecimal((String) param);
-                        }
-                    }else if(param instanceof BigDecimal){
-                        if (parameters[0].getType() == Integer.class) {
-                            param =((BigDecimal) param).intValue();
-                        }else if (parameters[0].getType() == Long.class) {
-                            param = ((BigDecimal) param).longValue();
-                        }
-                    }
-                }
-                method.invoke(instance, param);
-            }catch (Exception e){
-                logger.error("{} parse error {}",method,param);
-                e.printStackTrace();
-            }
+    public static void setValue(String fieldName,Object value,Object instance) throws ValidException {
+        if(StringUtils.isEmpty(fieldName)){
+            throw new ValidException(CoreErrorMessage.FIELD_IS_NULL);
         }
+        try {
+            Map<String,Method> methodMap = getWriteMap(instance.getClass());
+            Method method = methodMap.get(fieldName);
+            if(method==null){
+                throw new ValidException(CoreErrorMessage.FIELD_NOT_EXIST_WRITE_METHOD);
+            }
+            setValue(method,value,instance);
+        } catch (IntrospectionException e) {
+            logger.debug("getWriteMap error={}",e);
+        }
+    }
+
+    public static void setValue(ReflectBean bean,Object value,Object instance){
+        Method method = bean.getMethod();
+        setValue(method,value,instance);
+    }
+
+    public static void setValue(Method method,Object value,Object instance){
+        Object param = null;
+        try {
+            Parameter[] parameters = method.getParameters();
+            if(parameters!=null && parameters.length>0){
+                Class type = parameters[0].getType();
+                if (type.equals(String.class)) {
+                    param = value+"";
+                }else if (type.equals(Boolean.class) || type.equals(boolean.class)) {
+                    String temp = value.toString();
+                    param = !"0".equals(temp) && "false".equals(temp);// fixed boolean mapper
+                } else if (type.equals(Integer.class) || type.equals(int.class)) {
+                    param = Integer.valueOf(value+"");
+                } else if (type.equals(Double.class) || type.equals(double.class)) {
+                    param = Double.valueOf(value+"");
+                } else if (type.equals(Float.class) || type.equals(float.class)) {
+                    param = Float.valueOf(value+"");
+                } else if (type.equals(Long.class) || type.equals(Long.class)) {
+                    param = Long.valueOf(value+"");
+                }else if(type.equals(BigDecimal.class)) {
+                    param = new BigDecimal(value+"");
+                } else if (type.equals(Date.class)) {
+                    if (value instanceof Timestamp) {
+                        param = new Date(((Timestamp) value).getTime());
+                    } else {
+                        if (CommonUtil.isInteger(value+"")) {
+                            param = new Date(Long.valueOf(value+""));
+                        } else {
+                            param = new Date(value+"");
+                        }
+                    }
+                } else if (type.equals(Timestamp.class)) {
+                    if (CommonUtil.isInteger(value+"")) {
+                        param = new Timestamp(Long.valueOf(value+""));
+                    } else {
+                        param = Timestamp.valueOf(value+"");
+                    }
+                } else if (type.equals(Byte.class) || type.equals(byte.class)) {
+                    if ("false".equals(value)) {
+                        param = (byte) 0;
+                    } else if ("true".equals(value)) {
+                        param = (byte) 1;
+                    } else {
+                        param = Byte.valueOf(value+"");
+                    }
+                } else if (type.equals(Blob.class)) {
+                    try {
+                        param = new SerialBlob((byte[]) value);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            method.invoke(instance, param);
+        }catch (Exception e){
+            logger.error("{} parse error {} error={}",method,param,e);
+        }
+    }
+    public static void copyValue(Method method, Object value, Object instance) {
+        ReflectUtils.setValue(method,value,instance);
     }
 
 }
