@@ -126,9 +126,14 @@
     Q：接口返回的视图类
     W: 分页请求参数类
     ````
-   4.3
+   4.3 自定义查询
    ````aidl
-    待完善
+   @Reource
+   QueryFactory queryFactory;
+   ListResult<ProvinceDto> provinceDtoList =  queryFactory.selectListByKeys(ProvinceEntity.class,new QueryParam[]{
+                   new QueryParam("del_flag",false)
+           }, ProvinceDto.class);//查询自定信息，ProvinceEntity.class为实体类
+   PageResult<ADto> listResult = queryFactory.selectPageAndKeys("select * from student A ",getQueryParameter(req),req,ADto.class,getKeys());//通过sql查询数据 ADto.class为接口返回视图类
    ````
 5. 全局token校验
     自定义实现CommonUserService类
