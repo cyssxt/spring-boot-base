@@ -13,7 +13,7 @@
     <version>1.0.3</version>
     <name>common</name>
     <packaging>jar</packaging>
-    <description>Demo project for Spring Boot</description>
+    <description>Rapid development framework for Spring boot</description>
 
     <properties>
         <java.version>1.8</java.version>
