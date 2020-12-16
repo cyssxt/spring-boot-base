@@ -268,7 +268,7 @@ public class ReflectUtils {
                     param = value+"";
                 }else if (type.equals(Boolean.class) || type.equals(boolean.class)) {
                     String temp = value.toString();
-                    param = !"0".equals(temp) && "false".equals(temp);// fixed boolean mapper
+                    param = !"0".equals(temp) && !"false".equals(temp);// fixed boolean mapper
                 } else if (type.equals(Integer.class) || type.equals(int.class)) {
                     param = Integer.valueOf(value+"");
                 } else if (type.equals(Double.class) || type.equals(double.class)) {
