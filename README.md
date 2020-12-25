@@ -59,13 +59,13 @@
     import com.cyssxt.common.response.ErrorMessage;
     import com.cyssxt.common.response.ErrorMessage;
         
-    public enum  CarErrorMessage implements ErrorMessage {
+    public enum  TestErrorMessage implements ErrorMessage {
         CODE_NOT_EXIST(2000001, "验证码不存在");
             private Integer retCode;
         private String msg;
         private int status=200;
     
-        CarErrorMessage(Integer retCode, String msg){
+        TestErrorMessage(Integer retCode, String msg){
             this.retCode = retCode;
             this.msg = msg;
         }
@@ -87,14 +87,14 @@
     ````
     3.5 返回状态吗或者抛出异常
     ````
-    public ResponseData findCar(){
-        throw new ValidException(CarErrorMessage.CODE_NOT_EXIST);
+    public ResponseData findTest(){
+        throw new ValidException(TestErrorMessage.CODE_NOT_EXIST);
     }
     ````
     OR
     ````
-    public ResponseData findCar(){
-        return ResponseData fail(CarErrorMessage.CODE_NOT_EXIST);
+    public ResponseData findTest(){
+        return ResponseData fail(TestErrorMessage.CODE_NOT_EXIST);
     }
     ````    
 
@@ -141,7 +141,7 @@
     ````aidl
         @Override
         public UserInfo findById(String userId) throws ValidException {
-            UserEntity userEntity = JpaUtil.get(userId,userRepository,CarErrorMessage.USER_NOT_EXIST);
+            UserEntity userEntity = JpaUtil.get(userId,userRepository,TestErrorMessage.USER_NOT_EXIST);
             if(userEntity!=null && CommonUtil.isTrue(userEntity.getDelFlag())){
                 throw new ValidException(CoreErrorMessage.USER_ID_NOT_NULL);
             }
