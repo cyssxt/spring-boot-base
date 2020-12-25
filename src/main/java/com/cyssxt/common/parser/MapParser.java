@@ -64,9 +64,8 @@ public class MapParser {
                 }else{
                     realName = parser!=null?parser.getName(name):getKeyName(name);
                 }
-                Class type = field.getType();
                 if(method!=null) {
-                    ReflectUtils.copyValue(method, type, params.get(realName), this);
+                    ReflectUtils.copyValue(method, params.get(realName), this);
                 }
             }
         } catch (IntrospectionException e) {

@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
+import java.beans.Transient;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -34,6 +35,11 @@ public class BaseEntity extends Copy implements Serializable,Cloneable {
         this.createTime = DateUtil.getCurrentTimestamp();
         this.updateTime = this.createTime;
         this.delFlag = false;
+    }
+
+    @Transient
+    public boolean delStatus(){
+        return CommonUtil.isTrue(this.getDelFlag());
     }
 
     @Id
